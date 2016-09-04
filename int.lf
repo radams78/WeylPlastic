@@ -1,0 +1,75 @@
+> module int where;
+
+> import nat_plus;
+
+> [int = prod nat nat];
+> [Int = Prod Nat Nat];
+> [minus [m, n : Nat] = pair ? ? m n : Int];
+
+> [eqZ [x, y : Int] = eq nat (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+> [EqZ [x, y : Int] = Eq nat (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+
+> Claim EqZ_ref : (x : Int) EqZ x x;
+> Intros x;
+> Refine EqI;
+> ReturnAll;
+> EqZ_ref;
+
+> Claim EqZ_sym : (x, y : Int) EqZ x y -> EqZ y x;
+> Intros x y;
+> Refine sym;
+> ReturnAll;
+> EqZ_sym;
+
+> Claim EqZ_trans : (x, y, z : Int) EqZ x y -> EqZ y z -> EqZ x z;
+> Intros x y z x_is_y y_is_z;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> [e = pi1 ? ? z];
+> [f = pi2 ? ? z];
+> Refine plus_cancelr (plus a f) (plus e b) d;
+> Refine trans nat ? (plus a (plus f d));
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus a (plus d f));
+> 2 Refine wd nat nat (plus a);
+> 2 Refine plus_comm;
+> Refine trans nat ? (plus (plus a d) f);
+> 2 Refine plus_assocl;
+> Refine trans nat ? (plus (plus b c) f);
+> 2 Refine wd nat nat [t : Nat] plus t f;
+> 2 Refine trans nat ? (plus c b);
+> 3 Refine x_is_y;
+> 2 Refine plus_comm;
+> Refine trans nat ? (plus b (plus c f));
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus b (plus e d));
+> 2 Refine wd nat nat (plus b);
+> 2 Refine y_is_z;
+> Refine trans nat ? (plus (plus b e) d);
+> 2 Refine plus_assocl;
+> Refine wd nat nat [t : Nat] plus t d;
+> Refine plus_comm;
+> ReturnAll;
+> EqZ_trans;
+
+> [NtoZ [n : Nat] = minus n zero];
+> Coercion = NtoZ;
+
+> Claim NtoZwd : (m, n : Nat) Eq nat m n -> EqZ m n;
+> Intros m n m_is_n;
+> Refine m_is_n;
+> ReturnAll;
+> NtoZwd;
+
+> Claim NtoZwd' : (m, n : Nat) EqZ m n -> Eq nat m n;
+> Intros m n m_is_n;
+> Refine m_is_n;
+> ReturnAll;
+> NtoZwd';
+
+> Claim one_not_zeroZ : Not (EqZ one zero);
+> Refine Peano4;
+> ReturnAll;
+> one_not_zeroZ;

@@ -1,0 +1,41 @@
+> module real_plus where;
+
+> import real;
+
+Addition of Real Numbers
+
+> [plusR [x, y : SInt2] = set Int2 [q : Int2] and (rational q) (
+>   ex int2 [r : Int2] and (rational r) (and (in ? r x) (
+>   ex int2 [s : Int2] and (rational s) (and (in ? s y) (
+>   eqQ q (plusQ r s)))))) : SInt2];
+
+> [plusRtotal : (x, y : SInt2) Real x -> Real y -> Real (plusR x y)];
+
+> [plusRwdl : (x, x', y : SInt2) EqR x x' -> EqR (plusR x y) (plusR x' y)];
+> [plusRwdr : (x, y, y' : SInt2) EqR y y' -> EqR (plusR x y) (plusR x y')];
+> [plusRwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> EqR (plusR x y) (plusR x' y')];
+
+> [Q2Rplus : (q, r : Int2) Rational q -> Rational r -> EqR (plusQ q r) (plusR q r)];
+
+> [plusR_comm : (x, y : SInt2) Real x -> Real y -> EqR (plusR x y) (plusR y x)];
+
+> [plusR_assocl : (x, y, z : SInt2) Real x -> Real y -> Real z -> EqR (plusR x (plusR y z)) (plusR (plusR x y) z)];
+> [plusR_assocr : (x, y, z : SInt2) Real x -> Real y -> Real z -> EqR (plusR (plusR x y) z) (plusR x (plusR y z))];
+
+> [plusR_zero : (x : SInt2) Real x -> EqR (plusR x zero) x];
+> [zero_plusR : (x : SInt2) Real x -> EqR (plusR zero x) x];
+
+> [minusR [x : SInt2] = set Int2 [q : Int2] and (rational q) (
+>   ex int2 [r : Int2] and (rational r) (
+>   and (ltQ r (minusQ q)) (not (in ? r x))))];
+
+> [minusRtotal : (x : SInt2) Real x -> Real (minusR x)];
+> [minusRwd : (x, y : SInt2) EqR x y -> EqR (minusR x) (minusR y)];
+
+> [plusR_minusR : (x : SInt2) Real x -> EqR (plusR x (minusR x)) zero];
+> [minusR_plusR : (x : SInt2) Real x -> EqR (plusR (minusR x) x) zero];
+
+> [minusRminus : (x, y : SInt2) Real x -> Real y -> EqR (minusR (plusR x (minusR y))) (plusR y (minusR x))];
+> [minusR_plusR_minusR : (x, y : SInt2) Real x -> Real y -> EqR (plusR (minusR x) (minusR y)) (minusR (plusR x y))];
+
+> [minusR_zero : EqR (minusR zero) zero];

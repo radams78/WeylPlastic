@@ -1,0 +1,156 @@
+> module porder where;
+
+> import ppreorder;
+> import psetoid;
+
+Partial Partial Orders
+
+> [porder = [A : Type][eA : A -> A -> Prop][le : A -> A -> Prop]
+>  And (psetoid A eA)
+>  (And (All A [x : A] Imp (eA x x) (le x x))
+>  (And (All A [x : A] All A [y : A] Imp (And (le x y) (le y x)) (eA x y))
+>  (And (All A [x : A] All A [y : A] Imp (le x y) (eA x x))
+>  (And (All A [x : A] All A [y : A] Imp (le x y) (eA y y))
+>  (transitive A le)))))];
+
+> [porderI : (A : Type) (eA : A -> A -> Prop)(le : A -> A -> Prop)
+>  psetoid A eA ->
+>  ((x : A) eA x x -> le x x) ->
+>  ((x,y : A) le x y -> le y x -> eA x y) ->
+>  ((x,y : A) le x y -> eA x x) ->
+>  ((x,y : A) le x y -> eA y y) ->
+>  ((x,y,z : A) le x y -> le y z -> le x z) ->
+>  porder A eA le];
+  Claim porderI : (A : Type) (eA : A -> A -> Prop)(le : A -> A -> Prop)
+  psetoid A eA ->
+  ((x : A) eA x x -> le x x) ->
+  ((x,y : A) le x y -> le y x -> eA x y) ->
+  ((x,y : A) le x y -> eA x x) ->
+  ((x,y : A) le x y -> eA y y) ->
+  ((x,y,z : A) le x y -> le y z -> le x z) ->
+  porder A eA le;
+ Intros A eA le ps r as tl tr t;
+ Refine AndI;
+ Refine AndI;
+ Refine AndI;
+ Refine AndI;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine ImpI;
+ Refine AndE;
+ Refine t;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine tr;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine tl;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine AndE;
+ Refine as;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine ImpI;
+ Refine r;
+ ReturnAll;
+ Refine ps;
+ ReturnAll;
+
+> [porder_psetoid : (A : Type) (eA,le : A -> A -> Prop)
+>  porder A eA le -> psetoid A eA];
+ Claim porder_psetoid : (A : Type) (eA,le : A -> A -> Prop)
+  porder A eA le -> psetoid A eA;
+ Intros A eA le;
+ Refine AndE1;
+ ReturnAll;
+
+> [porder_ref : (A : Type) (eA,le : A -> A -> Prop) (a : A)
+>  porder A eA le -> eA a a -> le a a];
+ Claim porder_ref : (A : Type) (eA,le : A -> A -> Prop) (a : A)
+  porder A eA le -> eA a a -> le a a;
+ Intros A eA le a ord;
+ Refine ImpE;
+ Refine AllE ? ? ? (AndE1 ? ? (AndE2 ? ? ord));
+ ReturnAll;
+
+> [porder_antisym : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+>  porder A eA le -> le a b -> le b a -> eA a b];
+ Claim porder_antisym : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+  porder A eA le -> le a b -> le b a -> eA a b;
+ Intros A eA le a b ord a_le_b b_le_a;
+ Refine ImpE;
+ Refine AndI ? ? a_le_b b_le_a;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? (AndE2 ? ? ord))));
+ ReturnAll;
+
+> [porder_totall : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+>  porder A eA le -> le a b -> eA a a];
+ Claim porder_totall : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+  porder A eA le -> le a b -> eA a a;
+ Intros A eA le a b ord;
+ Refine ImpE;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? ord)))));
+ ReturnAll;
+
+> [porder_totalr : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+>  porder A eA le -> le a b -> eA b b];
+ Claim porder_totalr : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+  porder A eA le -> le a b -> eA b b;
+ Intros A eA le a b ord;
+ Refine ImpE;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? ord))))));
+ ReturnAll;
+
+> [porder_trans : (A : Type) (eA, le : A -> A -> Prop) (a,b,c : A)
+>  porder A eA le -> le a b -> le b c -> le a c];
+ Claim porder_trans : (A : Type) (eA, le : A -> A -> Prop) (a,b,c : A)
+  porder A eA le -> le a b -> le b c -> le a c;
+ Intros A eA le a b c ord a_le_b b_le_c;
+ Refine ImpE;
+ Refine AndI ? ? a_le_b b_le_c;
+ Refine AllE ? ? ? (AllE ? ? ? (AllE ? ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? ord)))))));
+ ReturnAll;
+
+> [porder_ppreorder : (A : Type) (eA, le : A -> A -> Prop)
+>  porder A eA le -> ppreorder A le];
+ Claim porder_ppreorder : (A : Type) (eA, le : A -> A -> Prop)
+  porder A eA le -> ppreorder A le;
+ Intros A eA le ord;
+ Refine ppreorderI;
+ Intros x y x_le_y;
+ Refine porder_ref A eA le;
+ Refine porder_totalr A eA le;
+ Refine x_le_y;
+ Refine ord;
+ Refine ord;
+ ReturnAll;
+ Intros x y x_le_y;
+ Refine porder_ref A eA le;
+ Refine porder_totall A eA le;
+ Refine x_le_y;
+ Refine ord;
+ Refine ord;
+ ReturnAll;
+ Intros x y z;
+ Refine porder_trans A eA le;
+ Refine ord;
+ ReturnAll;

@@ -1,0 +1,120 @@
+> module psetoid where;
+
+Partial Setoids
+
+> import ppreorder;
+
+> [psetoid = [A : Type][eA : A -> A -> Prop]
+>  And (symmetric A eA) (transitive A eA)];
+
+> [psetoidI : (A : Type) (eA : A -> A -> Prop)
+>  ((x,y : A) eA x y -> eA y x) ->
+>  ((x,y,z : A) eA x y -> eA y z -> eA x z) ->
+>  psetoid A eA];
+ Claim psetoidI : (A : Type) (eA : A -> A -> Prop)
+  ((x,y : A) eA x y -> eA y x) ->
+  ((x,y,z : A) eA x y -> eA y z -> eA x z) ->
+  psetoid A eA;
+ Intros A eA s t;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine ImpI;
+ Refine AndE;
+ Refine t;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine s;
+ ReturnAll;
+
+> [psetoid_sym : (A : Type) (eA : A -> A -> Prop) (a,b : A)
+>  psetoid A eA -> eA a b -> eA b a];
+ Claim psetoid_sym : (A : Type) (eA : A -> A -> Prop) (a,b : A)
+  psetoid A eA -> eA a b -> eA b a;
+ Intros A eA a b pset;
+ Refine ImpE;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? pset));
+ ReturnAll;
+
+> [psetoid_trans : (A : Type) (eA : A -> A -> Prop) (a,b,c : A)
+>  psetoid A eA -> eA a b -> eA b c -> eA a c];
+ Claim psetoid_trans : (A : Type) (eA : A -> A -> Prop) (a,b,c : A)
+  psetoid A eA -> eA a b -> eA b c -> eA a c;
+ Intros A eA a b c pset a_is_b b_is_c;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? b (AllE ? ? ? (AndE2 ? ? pset)));
+ Refine AndI;
+ Refine b_is_c;
+ Refine a_is_b;
+ ReturnAll;
+
+> [psetoid_ppreorder : (A : Type) (eA : A -> A -> Prop)
+>  psetoid A eA -> ppreorder A eA];
+ Claim psetoid_ppreorder : (A : Type) (eA : A -> A -> Prop)
+  psetoid A eA -> ppreorder A eA;
+ Intros A le pset;
+ Refine ppreorderI;
+ Intros x y x_le_y;
+ Refine m_4;
+ Refine x_le_y;
+ Refine psetoid_sym A le;
+ Refine x_le_y;
+ Refine pset;
+ ReturnAll;
+ Intros x y x_le_y;
+ Refine m_4;
+ Refine psetoid_sym A le;
+ Refine x_le_y;
+ Refine pset;
+ Refine x_le_y;
+ ReturnAll;
+ Intros x y z;
+ Refine psetoid_trans A le;
+ Refine pset;
+ ReturnAll;
+
+> [func2 = [A : Type] [eA : A -> A -> Prop] [f : A -> A -> A]
+>  All A [x : A] All A [x' : A] All A [y : A] All A [y' : A]
+>  Imp (And (eA x x') (eA y y')) (eA (f x y) (f x' y'))];
+
+> [func2I :(A : Type) (eA : A -> A -> Prop) (f : A -> A -> A)
+>  ((x,x',y,y' : A) eA x x' -> eA y y' -> eA (f x y) (f x' y')) ->
+>  func2 A eA f];
+ Claim func2I : (A : Type) (eA : A -> A -> Prop) (f : A -> A -> A)
+ ((x,x',y,y' : A) eA x x' -> eA y y' -> eA (f x y) (f x' y')) ->
+ func2 A eA f;
+ Intros A eA f H;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros x';
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros y';
+ Refine ImpI;
+ Refine AndE;
+ Refine H;
+ ReturnAll;
+
+> [func2E : (A : Type) (eA : A -> A -> Prop) (f : A -> A -> A)
+>  (a,a',b,b' : A)
+>  func2 A eA f -> eA a a' -> eA b b' -> eA (f a b) (f a' b')];
+ Claim func2E : (A : Type) (eA : A -> A -> Prop) (f : A -> A -> A)
+ (a,a',b,b' : A)
+ func2 A eA f -> eA a a' -> eA b b' -> eA (f a b) (f a' b');
+ Intros A eA f a a' b b' H a_is_a' b_is_b';
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? ? (AllE ? ? ? (AllE ? ? ? H)));
+ Refine AndI;
+ Refine b_is_b';
+ Refine a_is_a';
+ ReturnAll;

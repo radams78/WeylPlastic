@@ -1,0 +1,58 @@
+> module psemigroup where;
+
+> import psetoid;
+
+> [psemigroup = [A : Type][eA : A -> A -> Prop][o : A -> A -> A]
+>  And (psetoid A eA)
+>  (And (func2 A eA o)
+>  (All A [x : A] All A [y : A] All A [z : A]
+>  eA (o x (o y z)) (o (o x y) z)))];
+
+> [psemigroupI : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+>  psetoid A eA -> func2 A eA o ->
+>  ((x,y,z : A) eA (o x (o y z)) (o (o x y) z)) ->
+>  psemigroup A eA o];
+ Claim psemigroupI : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+  psetoid A eA -> func2 A eA o ->
+  ((x,y,z : A) eA (o x (o y z)) (o (o x y) z)) ->
+  psemigroup A eA o;
+ Intros A eA o H1 H2 H3;
+ Refine AndI;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine H3;
+ ReturnAll;
+ Refine H2;
+ Refine H1;
+ ReturnAll;
+
+> [psemigroup_psetoid : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+>  psemigroup A eA o -> psetoid A eA];
+ Claim psemigroup_psetoid : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+  psemigroup A eA o -> psetoid A eA;
+ Intros A eA o;
+ Refine AndE1;
+ ReturnAll;
+
+> [psemigroup_func2 : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+>  psemigroup A eA o -> func2 A eA o];
+ Claim psemigroup_func2 : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+  psemigroup A eA o -> func2 A eA o;
+ Intros A eA o H;
+ Refine AndE1;
+ Refine AndE2;
+ Refine H;
+ ReturnAll;
+
+> [psemigroup_assoc : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+>  (a,b,c : A) psemigroup A eA o -> eA (o a (o b c)) (o (o a b) c)];
+ Claim psemigroup_assoc : (A : Type) (eA : A -> A -> Prop) (o : A -> A -> A)
+  (a,b,c : A) psemigroup A eA o -> eA (o a (o b c)) (o (o a b) c);
+ Intros A eA o a b c H;
+ Refine AllE ? ? ? (AllE ? ? ? (AllE ? ? ? (AndE2 ? ? (AndE2 ? ? H))));
+ ReturnAll;

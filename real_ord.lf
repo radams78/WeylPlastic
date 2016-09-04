@@ -1,0 +1,174 @@
+> module real_ord where;
+
+> import real_plus;
+
+Weak Ordering of Reals
+
+> [leR [x, y : SInt2] = all int2 [q : Int2] imp (rational q) (imp (in Int2 q x) (in Int2 q y))];
+> [LeR [x, y : SInt2] = All Int2 [q : Int2] Imp (Rational q) (Imp (In Int2 q x) (In Int2 q y))];
+
+> Claim LeRI : (x, y : SInt2) ((q : Int2) Rational q -> In Int2 q x -> In Int2 q y) -> LeR x y;
+> Intros x y H;
+> Refine AllI;
+> Intros q;
+> Refine ImpI;
+> Intros qrat;
+> Refine ImpI;
+> Refine H;
+> Refine qrat;
+> ReturnAll;
+> LeRI;
+
+> Claim LeRE : (x, y : SInt2) (q : Int2) LeR x y -> Rational q -> In Int2 q x -> In Int2 q y;
+> Intros x y q xley qrat;
+> Refine ImpE;
+> Refine ImpE;
+> Refine qrat;
+> Refine AllE ? ? q xley;
+> ReturnAll;
+> LeRE;
+
+> [LeRwdl : (x, x', y : SInt2) EqR x x' -> LeR x y -> LeR x' y];
+> [LeRwdr : (x, y, y' : SInt2) EqR y y' -> LeR x y -> LeR x y'];
+> [LeRwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> LeR x y -> LeR x' y'];
+
+> [LeR_ref : (x : SInt2) LeR x x];
+> [LeR_trans : (x, y, z : SInt2) LeR x y -> LeR y z -> LeR x z];
+> [LeR_antisym : (x, y : SInt2) LeR x y -> LeR y x -> EqR x y];
+
+> [LeR_plusRl : (x, y, z : SInt2) Real x -> Real y -> Real z -> LeR x y -> LeR (plusR x z) (plusR y z)];
+> [LeR_plusRr : (x, y, z : SInt2) Real x -> Real y -> Real z -> LeR y z -> LeR (plusR x y) (plusR x z)];
+> [LeR_plusR : (x, y, z, w : SInt2) Real x -> Real y -> Real z -> Real w -> LeR x y -> LeR z w -> LeR (plusR x z) (plusR y w)];
+
+> [Q2RLe : (q, r : Int2) LeQ q r -> LeR q r];
+> [Q2RLe' : (q, r : Int2) LeR q r -> LeQ q r];
+
+> [Z2RLe : (x, y : Int) LeZ x y -> LeR x y];
+> [Z2RLe' : (x, y : Int) LeR x y -> LeZ x y];
+
+> [N2RLe : (m, n : Nat) Le m n -> LeR m n];
+> [N2RLe' : (m, n : Nat) LeR m n -> Le m n];
+
+Strict Ordering of Reals
+
+> [ltR [x, y : SInt2] = and (leR x y) (not (eqR x y))];
+> [LtR [x, y : SInt2] = And (LeR x y) (Not (EqR x y))];
+
+> [LtRwdl : (x, x', y : SInt2) EqR x x' -> LtR x y -> LtR x' y];
+> [LtRwdr : (x, y, y' : SInt2) EqR y y' -> LtR x y -> LtR x y'];
+> [LtRwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> LtR x y -> LtR x' y'];
+
+> [LtR_trans : (x, y, z : SInt2) LtR x y -> LtR y z -> LtR x z];
+> [LtR_trichotomy : (x, y : SInt2) Real x -> Real y -> Or (LtR x y) (Or (EqR x y) (LtR y x))];
+> [LtR_irref : (x : SInt2) LtR x x -> False];
+
+> [LtR_assym : (x, y : SInt2) LtR x y -> LtR y x -> False];
+> [LtR_assym' : (x, y : SInt2) (P : Prop) LtR x y -> LtR y x -> P];
+
+> [LtR_plusRl : (x, y, z : SInt2) Real x -> Real y -> Real z -> LtR x y -> LtR (plusR x z) (plusR y z)];
+> [LtR_plusRr : (x, y, z : SInt2) Real x -> Real y -> Real z -> LtR y z -> LtR (plusR x y) (plusR x z)];
+> [LtR_plusR : (x, y, z, w : SInt2) Real x -> Real y -> Real z -> Real w -> LtR x y -> LtR z w -> LtR (plusR x z) (plusR y w)];
+
+> [LtR_minusR : (x, y : SInt2) Real x -> Real y -> LtR x y -> LtR (minusR y) (minusR x)];
+> [LtR_minusR' : (x, y : SInt2) Real x -> Real y -> LtR (minusR x) (minusR y) -> LtR y x];
+
+> [LeR_LtR_trans : (x, y, z : SInt2) LeR x y -> LtR y z -> LtR x z];
+> [LtR_LeR_trans : (x, y, z : SInt2) LtR x y -> LeR y z -> LtR x z];
+
+> [LtR_LeR : (x, y : SInt2) LtR x y -> LeR x y];
+
+> [In_Lt : (q : Int2) (X : SInt2) Rational q -> Real X -> In ? q X -> LtR q X];
+> [Lt_In : (q : Int2) (X : SInt2) Rational q -> Real X -> LtR q X -> In ? q X];
+
+> [Q2RLt : (q, r : Int2) LtQ q r -> LtR q r];
+> [Q2RLt' : (q, r : Int2) LtR q r -> LtQ q r];
+
+> [Z2RLt : (x, y : Int) LtZ x y -> LtR x y];
+> [Z2RLt' : (x, y : Int) LtR x y -> LtZ x y];
+
+> [N2RLt : (m, n : Nat) Lt m n -> LtR m n];
+> [N2RLt' : (m, n : Nat) LtR m n -> Lt m n];
+
+> Claim zero_LtR_one : LtR zero one;
+> Refine Q2RLt zero one;
+> Refine zero_LtQ_one;
+> ReturnAll;
+
+> Claim LtR_plusone : (x : SInt2) Real x -> LtR x (plusR x one);
+> Intros x xreal;
+> Refine LtRwdl (plusR x zero);
+> Refine LtR_plusRr x zero one;
+> Refine zero_LtR_one;
+> Refine ZtoRtotal one;
+> Refine ZtoRtotal zero;
+> Refine xreal;
+> Refine plusR_zero;
+> Refine xreal;
+> ReturnAll;
+> LtR_plusone;
+
+> [minusone_LtR : (x : SInt2) Real x -> LtR (plusR x (minusR one)) x];
+
+> [posR [x : SInt2] = ltR zero x];
+> [PosR [x : SInt2] = LtR zero x];
+
+> [PosRwd : (x, y : SInt2) EqR x y -> PosR x -> PosR y];
+
+> [negR [x : SInt2] = ltR x zero];
+> [NegR [x : SInt2] = LtR x zero];
+
+> [NegRwd : (x, y : SInt2) EqR x y -> NegR x -> NegR y];
+
+Maximum of two reals
+
+> [max = union Int2 : SInt2 -> SInt2 -> SInt2];
+
+> [maxwdl : (x, x', y : SInt2) EqR x x' -> EqR (max x y) (max x' y)];
+> [maxwdr : (x, y, y' : SInt2) EqR y y' -> EqR (max x y) (max x y')];
+> [maxwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> EqR (max x y) (max x' y')];
+
+> [maxtotal : (x, y : SInt2) Real x -> Real y -> Real (max x y)];
+
+> [le_maxl : (x, y : SInt2) LeR x (max x y)];
+> [le_maxr : (x, y : SInt2) LeR y (max x y)];
+> [max_least : (x, y, z : SInt2) LeR x z -> LeR y z -> LeR (max x y) z];
+> [max_least' : (x, y, z : SInt2) LtR x z -> LtR y z -> LtR (max x y) z];
+
+Minimum of two reals
+
+> [min = inter Int2 : SInt2 -> SInt2 -> SInt2];
+
+> [minwdl : (x, x', y : SInt2) EqR x x' -> EqR (min x y) (min x' y)];
+> [minwdr : (x, y, y' : SInt2) EqR y y' -> EqR (min x y) (min x y')];
+> [minwd  : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> EqR (min x y) (min x' y')];
+
+> [mintotal : (x, y : SInt2) Real x -> Real y -> Real (min x y)];
+
+> [ge_minl : (x, y : SInt2) LeR (min x y) x];
+> [ge_minr : (x, y : SInt2) LeR (min x y) y];
+> [min_greatest : (x, y, z : SInt2) LeR x y -> LeR x z -> LeR x (min y z)];
+> [min_greatest' : (x, y, z : SInt2) LtR x y -> LtR x z -> LtR x (min y z)];
+
+Distance between two reals
+
+> [dist [x, y : SInt2] = max (plusR x (minusR y)) (plusR y (minusR x))];
+
+> [distwdl : (x, x', y : SInt2) EqR x x' -> EqR (dist x y) (dist x' y)];
+> [distwdr : (x, y, y' : SInt2) EqR y y' -> EqR (dist x y) (dist x y')];
+> [distwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> EqR (dist x y) (dist x' y')];
+
+> [disttotal : (x, y : SInt2) Real x -> Real y -> Real (dist x y)];
+
+> [dist_pos : (x, y : SInt2) Real x -> Real y -> LeR zero (dist x y)];
+> [dist_zero : (x : SInt2) Real x -> EqR (dist x x) zero];
+> [dist_zero' : (x, y : SInt2) Real x -> Real y -> EqR (dist x y) zero -> EqR x y];
+> [dist_sym : (x, y : SInt2) Real x -> Real y -> EqR (dist x y) (dist y x)];
+> [dist_triangle : (x, y, z : SInt2) Real x -> Real y -> Real z -> LeR (dist x z) (plusR (dist x y) (dist y z))];
+
+Absolute value of a real
+
+> [abs [x : SInt2] = dist x zero];
+
+Between any two distinct reals lies a rational
+
+> [LtR_dense : (x, y : SInt2) Real x -> Real y -> LtR x y -> Ex Int2 [z : Int2] And (Rational z) (And (LtR x z) (LtR z y))];

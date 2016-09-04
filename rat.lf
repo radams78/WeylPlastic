@@ -1,0 +1,242 @@
+> module rat where;
+
+> import int_ord;
+> import set;
+
+> [preQ = prod int int];
+> [PreQ = Prod Int Int];
+> [div [x, y : Int] = pair Int Int x y : PreQ];
+
+> [rational [q : PreQ] = not (eqZ (pi2 ? ? q) zero)];
+> [Rational [q : PreQ] = Not (EqZ (pi2 ? ? q) zero)];
+
+> [eqQ [q, r : PreQ] = eqZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q))];
+> [EqQ [q, r : PreQ] = EqZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q))];
+
+> Claim EqQ_ref : (q : PreQ) EqQ q q;
+> Intros q;
+> Refine EqZ_ref;
+> ReturnAll;
+> EqQ_ref;
+
+> Claim EqQ_sym : (q, r : PreQ) EqQ q r -> EqQ r q;
+> Intros q r;
+> Refine EqZ_sym (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ?? q));
+> ReturnAll;
+> EqQ_sym;
+
+> Claim EqQ_trans : (q, r, s : PreQ) Rational r -> EqQ q r -> EqQ r s -> EqQ q s;
+> Intros q r s r_rat q_is_r r_is_s;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> [e = pi1 ? ? s];
+> [f = pi2 ? ? s];
+> Refine timesZ_cancelr (timesZ a f) (timesZ e b) d;
+> Refine r_rat;
+> Refine EqZ_trans (timesZ (timesZ a f) d) (timesZ d (timesZ a f)) (timesZ (timesZ e b) d);
+> 2 Refine timesZ_comm (timesZ a f) d;
+> Refine EqZ_trans (timesZ d (timesZ a f)) (timesZ (timesZ d a) f) (timesZ (timesZ e b) d);
+> 2 Refine timesZ_assocl;
+> Refine EqZ_trans (timesZ (timesZ d a) f) (timesZ (timesZ b c) f) (timesZ (timesZ e b) d);
+> 2 Refine timesZwd (timesZ d a) (timesZ b c) f f;
+> 2 Refine EqZ_ref;
+> 2 Refine EqZ_trans (timesZ d a) (timesZ a d) (timesZ b c);
+> 3 Refine timesZ_comm;
+> 2 Refine EqZ_trans (timesZ a d) (timesZ c b) (timesZ b c);
+> 3 Refine q_is_r;
+> 2 Refine timesZ_comm;
+> Refine EqZ_trans (timesZ (timesZ b c) f) (timesZ b (timesZ c f)) (timesZ (timesZ e b) d);
+> 2 Refine timesZ_assocr;
+> Refine EqZ_trans (timesZ b (timesZ c f)) (timesZ b (timesZ e d)) (timesZ (timesZ e b) d);
+> 2 Refine timesZwd b b (timesZ c f) (timesZ e d);
+> 3 Refine EqZ_ref;
+> 2 Refine r_is_s;
+> Refine EqZ_trans (timesZ b (timesZ e d)) (timesZ (timesZ b e) d) (timesZ (timesZ e b) d);
+> 2 Refine timesZ_assocl;
+> Refine timesZwd (timesZ b e) (timesZ e b) d d;
+> 2 Refine timesZ_comm;
+> Refine EqZ_ref;
+> ReturnAll;
+> EqQ_trans;
+
+> Claim divwd : (x, x', y, y' : Int) EqZ x x' -> EqZ y y' -> EqQ (div x y) (div x' y');
+> Intros x x' y y' x_is_x' y_is_y';
+> Refine timesZwd;
+> 2 Refine x_is_x';
+> Refine EqZ_sym;
+> Refine y_is_y';
+> ReturnAll;
+> divwd;
+
+> [Q = set ? rational];
+
+> [ZtoQ [x : Int] = div x one];
+> Coercion = ZtoQ;
+
+> Claim ZtoQwd : (x, y : Int) EqZ x y -> EqQ x y;
+> Intros x y x_is_y;
+> Refine EqZ_trans (timesZ x one) x (timesZ y one);
+> 2 Refine timesZ_one;
+> Refine EqZ_trans x y (timesZ y one);
+> 2 Refine x_is_y;
+> Refine EqZ_sym (timesZ y one);
+> Refine timesZ_one;
+> ReturnAll;
+> ZtoQwd;
+
+> Claim ZtoQwd' : (x, y : Int) EqQ x y -> EqZ x y;
+> Intros x y x_is_y;
+> Refine EqZ_trans ? (timesZ x one);
+> 2 Refine EqZ_sym (timesZ x one);
+> 2 Refine timesZ_one;
+> Refine EqZ_trans ? (timesZ y one);
+> 2 Refine x_is_y;
+> Refine timesZ_one;
+> ReturnAll;
+> ZtoQwd';
+
+> Claim ZtoQtotal : (x : Int) Rational x;
+> Intros x;
+> Refine one_not_zeroZ;
+> ReturnAll;
+> ZtoQtotal;
+
+Domains of Rationals
+
+> [domrat [M : Set PreQ] = all preQ [q : PreQ] all preQ [r : PreQ]
+>   imp (rational q) (imp (rational r) (imp (eqQ q r) (imp (in PreQ q M) (in PreQ r M))))];
+> [DomRat [M : Set PreQ] = All PreQ [q : PreQ] All PreQ [r : PreQ]
+>   Imp (Rational q) (Imp (Rational r) (Imp (EqQ q r) (Imp (In PreQ q M) (In PreQ r M))))];
+
+> Claim DomRatI : (M : Set PreQ) ((q, r : PreQ) Rational q -> Rational r -> EqQ q r -> In PreQ q M -> In PreQ r M) -> DomRat M;
+> Intros M H;
+> Refine AllI;
+> Intros q;
+> Refine AllI;
+> Intros r;
+> Refine ImpI;
+> Intros ratq;
+> Refine ImpI;
+> Intros ratr;
+> Refine ImpI;
+> Intros q_is_r;
+> Refine ImpI;
+> Refine H;
+> Refine q_is_r;
+> Refine ratr;
+> Refine ratq;
+> ReturnAll;
+> DomRatI;
+
+> Claim DomRatE : (q, r : PreQ) (M : Set PreQ) DomRat M -> Rational q -> Rational r -> EqQ q r -> In PreQ q M -> In PreQ r M;
+> Intros q r M domratM ratq ratr q_is_r;
+> Refine ImpE;
+> Refine ImpE;
+> Refine q_is_r;
+> Refine ImpE;
+> Refine ratr;
+> Refine ImpE;
+> Refine ratq;
+> Refine AllE ? ? r (AllE ? ? q domratM);
+> ReturnAll;
+> DomRatE;
+
+> [eqdomrat [M, M' : Set PreQ] = all preQ [q : PreQ] imp (rational q) (iff (in ? q M) (in ? q M'))];
+> [EqDomRat [M, M' : Set PreQ] = All PreQ [q : PreQ] Imp (Rational q) (Iff (In ? q M) (In ? q M'))];
+
+> [EqDomRatI : (M, M' : Set PreQ) ((q : PreQ) Rational q -> In ? q M -> In ? q M') -> ((q : PreQ) Rational q -> In ? q M' -> In ? q M) -> EqDomRat M M'];
+  Claim EqDomRatI : (M, M' : Set PreQ) ((q : PreQ) Rational q -> In ? q M -> In ? q M') -> ((q : PreQ) Rational q -> In ? q M' -> In ? q M) -> EqDomRat M M';
+ Intros M M' H1 H2;
+ Expand EqDomRat;
+ Refine AllI;
+ Intros x;
+ Refine ImpI;
+ Intros xrat;
+ Refine IffI;
+ Refine H2;
+ Refine xrat;
+ Refine H1;
+ Refine xrat;
+ ReturnAll;
+
+> [EqDomRatE : (M, M' : Set PreQ) (q : PreQ) Rational q -> EqDomRat M M' -> In ? q M -> In ? q M'];
+ Claim EqDomRatE : (M, M' : Set PreQ) (q : PreQ) Rational q -> EqDomRat M M' -> In ? q M -> In ? q M';
+ Expand EqDomRat;
+ Intros M M' q qrat MisM';
+ Refine IffE1;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? MisM';
+ Refine qrat;
+ ReturnAll;
+
+> [EqDomRatE' : (M, M' : Set PreQ) (q : PreQ) Rational q -> EqDomRat M M' -> In ? q M' -> In ? q M];
+ Claim EqDomRatE' : (M, M' : Set PreQ) (q : PreQ) Rational q -> EqDomRat M M' -> In ? q M' -> In ? q M;
+ Expand EqDomRat;
+ Intros M M' q qrat H;
+ Refine IffE2;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? H;
+ Refine qrat;
+ ReturnAll;
+
+
+> [EqDomRat_ref : (M : Set PreQ) EqDomRat M M];
+ Claim EqDomRat_ref : (M : Set PreQ) EqDomRat M M;
+ Intros M;
+ Refine EqDomRatI;
+ Intros q _ H;
+ Refine H;
+ ReturnAll;
+ Intros q _ H;
+ Refine H;
+ ReturnAll;
+
+> [EqDomRat_sym : (M, M' : Set PreQ) EqDomRat M M' -> EqDomRat M' M];
+ Claim EqDomRat_sym : (M, M' : Set PreQ) EqDomRat M M' -> EqDomRat M' M;
+ Intros M M' M_is_M';
+ Refine EqDomRatI;
+ Intros q ratq;
+ Refine EqDomRatE;
+ Refine M_is_M';
+ Refine ratq;
+ ReturnAll;
+ Intros q ratq;
+ Refine EqDomRatE';
+ Refine M_is_M';
+ Refine ratq;
+ ReturnAll;
+
+> [EqDomRat_trans : (M, M', M'' : Set PreQ) EqDomRat M M' -> EqDomRat M' M'' -> EqDomRat M M''];
+ Claim EqDomRat_trans : (M, M', M'' : Set PreQ) EqDomRat M M' -> EqDomRat M' M'' -> EqDomRat M M'';
+ Intros M M' M'' M_is_M' M'_is_M'';
+ Refine EqDomRatI;
+ Intros q qrat q_in_M'';
+ Refine EqDomRatE' ? ? ? qrat M_is_M';
+ Refine EqDomRatE' ? ? ? qrat M'_is_M'' q_in_M'';
+ ReturnAll;
+ Intros q qrat q_in_M;
+ Refine EqDomRatE ? ? ? qrat M'_is_M'';
+ Refine EqDomRatE ? ? ? qrat M_is_M' q_in_M;
+ ReturnAll;
+
+> [DomRatwd : (M, M' : Set PreQ) EqDomRat M M' -> DomRat M -> DomRat M'];
+ Claim DomRatwd : (M, M' : Set PreQ) EqDomRat M M' -> DomRat M -> DomRat M';
+ Intros M M' M_is_M' Mdomrat;
+ Refine DomRatI;
+ Intros q r qrat rrat q_is_r q_in_M';
+ Refine EqDomRatE;
+ 2 Refine M_is_M';
+ Refine DomRatE;
+ 2 Refine q_is_r;
+ Refine EqDomRatE';
+ 2 Refine M_is_M';
+ Refine q_in_M';
+ Refine qrat;
+ Refine rrat;
+ Refine qrat;
+ Refine Mdomrat;
+ Refine rrat;
+ ReturnAll;
+

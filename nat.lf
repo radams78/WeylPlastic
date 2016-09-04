@@ -1,0 +1,64 @@
+> module nat where;
+
+> import set;
+
+> [one = succ zero];
+> [two = succ one];
+
+> Claim Peano3 : (m,n : Nat) Eq nat (succ m) (succ n) -> Eq nat m n;
+> Intros m n;
+> Claim pred : Nat -> Nat;
+> Refine E_Nat ([x : Nat] Nat) zero ([m,n : Nat] m);
+> Refine wd nat nat pred;
+> ReturnAll;
+> Peano3;
+
+> Claim Peano4 : (n : Nat) Not (Eq nat (succ n) zero);
+> Intros n;
+> Refine NotI;
+> Intros sn_is_zero;
+> Claim F : Nat -> Set Nat;
+> Refine E_Nat ([x : Nat] Set Nat) (empty Nat) [m:Nat][x:Set Nat](single nat zero);
+> Refine EqE nat ([z:Nat] In Nat zero (F z)) (succ n) zero (EqI nat zero);
+> Refine sn_is_zero;
+> ReturnAll;
+> Peano4;
+
+> Claim Peano4' : (n : Nat) (Q : Prop) Eq nat (succ n) zero -> Q;
+> Intros n Q Snzero;
+> Refine FalseE;
+> Refine NotE;
+> 2 Refine Peano4 n;
+> Refine Snzero;
+> ReturnAll;
+> Peano4';
+
+> Claim zero_or_succ : (n : Nat) Or (Eq nat n zero) (Ex Nat [k : Nat] Eq nat n (succ k));
+> Refine Ind_Nat [n : Nat] or (eq nat n zero) (ex nat [k : Nat] eq nat n (succ k));
+> 2 Refine OrI1;
+> 2 Refine EqI;
+> Intros n ih;
+> Refine OrI2;
+> Refine ExI Nat [k : Nat] Eq nat (succ n) (succ k);
+> Refine EqI;
+> ReturnAll;
+> zero_or_succ;
+
+> Claim zero_or_succ' : (n : Nat) (P : Prop) (Eq nat n zero -> P) -> ((k : Nat) Eq nat n (succ k) -> P) -> P;
+> Intros n P H K;
+> Refine OrE;
+> Refine zero_or_succ n;
+> 2 Refine H;
+> Refine ExE;
+> Refine K;
+> ReturnAll;
+> zero_or_succ';
+
+> Claim not_zero_succ : (n : Nat) (P : Prop) ((p : Nat) Eq nat n (succ p) -> P) -> Neq nat n zero -> P;
+> Intros n P H n_not_zero;
+> Refine zero_or_succ' n;
+> Refine H;
+> Refine NotE';
+> Refine n_not_zero;
+> ReturnAll;
+> not_zero_succ;

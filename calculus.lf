@@ -1,0 +1,1468 @@
+> import real_plus;
+> import real_ord;
+
+> [Ex1 [P : SInt2 -> Prop] = Ex ? [C : ?] And (Real C) (And (P C) (All ? [D : ?] Imp (Real D) (Imp (P D) (EqR C D))))];
+
+ Claim Ex1I : (P : SInt2 -> Prop) (C : SInt2) Real C -> P C ->
+   ((D : SInt2) Real D -> P D -> EqR C D) ->
+   Ex1 P;
+ Intros P C Creal PC H;
+ Refine ExI SInt2 ([C : ?] And (Real C) (And (P C) (All ? [D : ?] Imp (Real D) (Imp (P D) (EqR C D))))) C;
+ Refine AndI;
+ 2 Refine Creal;
+ Refine AndI;
+ 2 Refine PC;
+ Refine AllI;
+ Intros D;
+ Refine ImpI;
+ Intros Dreal;
+ Refine ImpI;
+ Refine H;
+ Refine Dreal;
+ ReturnAll;
+ Ex1I;
+
+> [plusinf = Q : SInt2];
+
+> [minusinf = empty Int2 : SInt2];
+
+> [Open_Cut_cases : (M : SInt2) Open_Cut M -> Or (Real M) (Or (EqR M plusinf) (EqR M minusinf))];
+
+> [liminf [t : Nat -> SInt2] = set Int2 [q : Int2] and (rational q)
+>   (ex int2 [r : Int2] ex nat [k : Nat] and (rational r)
+>     (and (ltQ q r) (all nat [l : Nat] imp (lt k l) (in ? r (t l)))))];
+
+> [Open_Cut_liminf : (t : Nat -> SInt2) ((n : Nat) Real (t n)) -> Open_Cut (liminf t)];
+
+> [convergent [f : Nat -> SInt2] = and (all nat [n : Nat] real (f n))
+>    (all int2 [r : Int2]
+>      imp (ltQ zero r)
+>        (ex nat [n : Nat]
+>         all nat [p : Nat] all nat [q : Nat]
+>         imp (lt n p)
+>         (imp (lt n q)
+>         (ltR (dist (f p) (f q)) r))))];
+> [Convergent [f : Nat -> SInt2] = And (All Nat [n : Nat] Real (f n))
+>    (All Int2 [r : Int2]
+>      Imp (LtQ zero r)
+>        (Ex Nat [n : Nat]
+>         All Nat [p : Nat] All Nat [q : Nat]
+>         Imp (Lt n p)
+>         (Imp (Lt n q)
+>         (LtR (dist (f p) (f q)) r))))];
+
+> [ConvergentI : (f : Nat -> SInt2) ((n : Nat) Real (f n)) -> ((r : ?) LtQ zero r ->
+>   Ex Nat [n : Nat] All Nat [p : Nat] All Nat [q : Nat] Imp (Lt n p) (Imp (Lt n q) (LtR (dist (f p) (f q)) r))) ->
+>   Convergent f];
+ Intros f Realf H;
+ Refine AndI;
+ 2 Refine AllI;
+ 2 Refine Realf;
+ Refine AllI;
+ Intros r;
+ Refine ImpI;
+ Refine H;
+ ReturnAll;
+ ConvergentI;
+
+> [Convergent_real : (f : Nat -> SInt2) (n : Nat) Convergent f -> Real (f n)];
+ Intros f n Convergentf;
+ Refine AllE Nat [n : Nat] Real (f n);
+ Refine AndE1;
+ Refine Convergentf;
+ ReturnAll;
+ Convergent_real;
+
+> [ConvergentE : (f : Nat -> SInt2) (r : ?) LtQ zero r -> Convergent f ->
+>   Ex Nat [n : Nat] All Nat [p : Nat] All Nat [q : Nat] Imp (Lt n p) (Imp (Lt n q) (LtR (dist (f p) (f q)) r))];
+ Intros f r posr;
+ Refine AndE;
+ Intros H K;
+ Refine ImpE;
+ 2 Refine AllE ? ? r K;
+ Refine posr;
+ ReturnAll;
+ ConvergentE;
+
+The proposition "(f n -> l) as (n -> infty)"
+
+> [converges [f : Nat -> SInt2] [l : SInt2] =
+>   and (all nat [n : Nat] real (f n))
+>   (and (real l)
+>   (all int2 [q : Int2]
+>    imp (ltQ zero q)
+>   (ex nat [n : Nat] all nat [p : Nat] imp (lt n p)
+>   (ltR (dist (f p) l) q))))];
+> [Converges [f : Nat -> SInt2] [l : SInt2] =
+>   And (All Nat [n : Nat] Real (f n))
+>   (And (Real l)
+>   (All Int2 [q : Int2]
+>    Imp (LtQ zero q)
+>   (Ex Nat [n : Nat] All Nat [p : Nat] Imp (Lt n p)
+>   (LtR (dist (f p) l) q))))];
+
+> [Converges_freal : (f : Nat -> SInt2) (l : SInt2) (n : Nat) Converges f l -> Real (f n)];
+ Intros f C n H;
+ Refine AllE ? [n : Nat] Real (f n);
+ Refine AndE1;
+ Refine H;
+ ReturnAll;
+ Converges_freal;
+
+> [Converges_real : (f : Nat -> SInt2) (l : SInt2) Converges f l -> Real l];
+ Intros f l;
+ Refine AndE;
+ Intros _;
+ Refine AndE1;
+ ReturnAll;
+ Converges_real;
+
+> [ConvergesE : (f : Nat -> SInt2) (l : SInt2) (q : Int2) Converges f l -> LtQ zero q ->
+>   Ex Nat [n : Nat] All Nat [p : Nat] Imp (Lt n p) (LtR (dist (f p) l) q)];
+ Intros f l q f_tendsto_l;
+ Refine ImpE;
+ [H = AndE2 ? ? f_tendsto_l];
+ [K = AndE2 ? ? H];
+ Refine AllE ? ? q K;
+ ReturnAll;
+ ConvergesE;
+
+Cauchy's Convergence Principle
+
+ Claim Cauchy : (f : Nat -> SInt2) (l : SInt2) Converges f l -> Convergent f;
+ Intros f l f_tendsto_l;
+ Refine ConvergentI;
+ 2 Intros n;
+ Refine Converges_freal f l;
+ Refine f_tendsto_l;
+ ReturnAll;
+ Intros r posr;
+ [halfr = timesQ r (invQ two)];
+ Claim halfrrat : Rational halfr;
+ Refine timesQtotal r (invQ two);
+ Refine invQtotal two;
+ Refine Peano4;
+ Refine LtQratr;
+ Refine posr;
+ Claim Stepone : Ex Nat [n : Nat] All Nat [p : Nat] Imp (Lt n p) (LtR (dist (f p) l) halfr);
+ Refine ConvergesE f l halfr;
+ 2 Refine f_tendsto_l;
+To prove 0 < r / 2:
+ Refine LtQwdl (timesQ zero (invQ two));
+ 3 Refine ZtoQtotal zero;
+ 2 Refine zero_timesQ (invQ two);
+ Refine LtQ_timesQr zero r (invQ two);
+ Refine invQ_pos two;
+ Refine NtoQLt zero two;
+ Refine LtI ? ? one;
+ Refine EqI;
+ Refine posr;
+Done - End of Claim Stepone
+ Refine ExE ? ? ? ? Stepone;
+ Intros n ndef;
+ Refine ExI;
+ 2 Refine n;
+ Refine AllI;
+ Intros p;
+ Refine AllI;
+ Intros q;
+ Refine ImpI;
+ Intros n_lt_p;
+ Refine ImpI;
+ Intros n_lt_q;
+ Refine LeR_LtR_trans ? (plusR (dist (f p) l) (dist (f q) l));
+ [halfr = timesQ r (invQ two)];
+ Claim halfrrat : Rational halfr;
+ Refine timesQtotal r (invQ two);
+ Refine invQtotal two;
+ Refine Peano4;
+ Refine LtQratr;
+ Refine posr;
+ Claim halfrreal : Real halfr;
+ Refine Q2Rtotal halfr;
+ Refine halfrrat;
+ Refine LtRwdr ? (plusR halfr halfr);
+ Refine LtR_plusR (dist (f p) l) halfr (dist (f q) l) halfr;
+ Refine ImpE;
+ Refine n_lt_q;
+ Refine AllE ? ? q ndef;
+ Refine ImpE;
+ Refine n_lt_p;
+ Refine AllE ? ? p ndef;
+ Refine halfrreal;
+ Refine disttotal;
+ Refine Converges_real ? ? f_tendsto_l;
+ Refine Converges_freal ? ? ? f_tendsto_l;
+ Refine halfrreal;
+ Refine disttotal;
+ Refine Converges_real ? ? f_tendsto_l;
+ Refine Converges_freal ? ? ? f_tendsto_l;
+ Refine EqR_trans ? (plusQ halfr halfr);
+ Refine Q2Rwd (plusQ halfr halfr) r;
+ Refine halfplushalf;
+ Refine LtQratr;
+ Refine posr;
+ Refine LtQratr;
+ Refine posr;
+ Refine plusQtotal halfr halfr;
+ Refine halfrrat;
+ Refine halfrrat;
+ Refine EqR_sym;
+ Refine Q2Rplus halfr halfr;
+ Refine halfrrat;
+ Refine halfrrat;
+ Refine LeRwdr ? (plusR (dist (f p) l) (dist l (f q)));
+ Refine dist_triangle;
+ Refine Converges_freal ? ? ? f_tendsto_l;
+ Refine Converges_real ? ? f_tendsto_l;
+ Refine Converges_freal ? ? ? f_tendsto_l;
+ Refine plusRwdr (dist (f p) l) (dist l (f q)) (dist (f q) l);
+ Refine dist_sym;
+ Refine Converges_freal ? ? ? f_tendsto_l;
+ Refine Converges_real ? ? f_tendsto_l;
+ ReturnAll;
+
+> [Cauchy' : (f : Nat -> SInt2) Convergent f -> Ex ? [C : ?] Converges f C];
+
+Exactly one real belongs to the intersection of a sequence of nested intervals whose lengths pass below every positive number.
+
+> [Thm9_8 : (f, g : Nat -> SInt2) ((n : Nat) Real (f n)) -> ((n : Nat) Real (g n)) ->
+>   ((n : Nat) LtR (f n) (f (succ n))) -> ((n : Nat) LtR (g (succ n)) (g n)) ->
+>   ((n : Nat) LtR (f n) (g n)) -> ((Q : Int2) LtQ zero Q -> Ex Nat [n : Nat] LtR (plusR (g n) (minusR (f n))) Q) ->
+>   Ex1 [C : SInt2] All Nat [n : Nat] And (LtR (f n) C) (LtR C (g n))];
+
+Given a monotone increasing sequence of real numbers whose members remain below a definite bound, there is a real to which the sequence converges.
+
+> [Thm9_9 : (f : Nat -> SInt2) (U : SInt2) ((n : Nat) Real (f n)) -> Real U ->
+>   ((n : Nat) LtR (f n) (f (succ n))) -> ((n : Nat) LtR (f n) U) ->
+>   Ex ? [L : ?] And (Real L) (Converges f L)];
+
+Dedekind's Cut Principle
+
+If A and B are two domains of rationals such that every rational that belongs to A is smaller than every one belonging to B, and if, for every positive rational a,
+there exists a rational x belonging to A and a rational y belonging to B such that y - x <= a, then there exists a unique real C such that
+(All Q in A) Q <= C and (All Q in B) C <= Q
+
+> [Dedekind : (A, B : SInt2) DomRat A -> DomRat B -> ((Q, R : Int2) Rational Q -> Rational R -> In ? Q A -> In ? R B -> LtQ Q R) ->
+>   ((a : Int2) LtQ zero a -> Ex ? [x : ?] Ex ? [y : ?] And (Rational x) (And (Rational y) (And (In ? x A) (And (In ? y B) (LeQ (plusQ y (minusQ x)) a))))) ->
+>   Ex1 [C : ?] And (All ? [Q : ?] Imp (Rational Q) (Imp (In ? Q A) (Not (LtR C Q)))) 
+>      (All ? [Q : ?] Imp (Rational Q) (Imp (In ? Q B) (Not (LtR Q C))))];
+
+Every nonempty set of rationals bounded above has a unique least upper bound
+
+> [upper_bound [A : Set Int2][U : SInt2] = and (real U) (all int2 [Q : ?] imp (rational Q) (imp (in ? Q A) (leR Q U)))];
+> [Upper_Bound [A : Set Int2][U : SInt2] = And (Real U) (All ? [Q : ?] Imp (Rational Q) (Imp (In ? Q A) (LeR Q U)))];
+
+> [Upper_BoundI : (A : Set Int2)(U : SInt2) Real U -> ((q : ?) Rational q -> In ? q A -> LeR q U) -> Upper_Bound A U];
+> [Upper_Bound_Real : (A : Set Int2) (U : SInt2) Upper_Bound A U -> Real U];
+> [Upper_BoundE : (A : Set Int2)(U : SInt2)(Q : ?) Upper_Bound A U -> Rational Q -> In ? Q A -> LeR Q U];
+
+> [Sup [A : Set Int2][U : SInt2] = And (Upper_Bound A U) (All ? [U' : SInt2] Imp (Real U') (Imp (Upper_Bound A U') (LeR U U')))];
+
+> [Sup_unique : (A : Set Int2) (Ex ? [S : SInt2] Sup A S) -> Ex1 [S : SInt2] Sup A S];
+ 
+ Claim Thm9_11 : (A : SInt2) (u : Int2) DomRat A -> Rational u -> ((R : Int2) Rational R -> In ? R A -> LtQ R u) ->
+  (w : Int2) Rational w -> In ? w A ->
+  Ex SInt2 [S : SInt2] Sup A S;
+ Intros A u Adomrat urat uub w wrat winA;
+ Refine ExI SInt2 ? (set Int2 [q : Int2] ex int2 [q' : Int2] and (in Int2 q' A) (ltQ q q'));
+ Refine AndI;
+ Refine AllI;
+ Intros U';
+ Refine ImpI;
+ Intros U'real;
+ Refine ImpI;
+ Intros U'ub;
+ Refine LeRI;
+ Intros x xrat;
+ Refine ExE Int2 [q' : Int2] And (In Int2 q' A) (LtQ x q');
+ Intros q';
+ Refine AndE;
+ Intros q'_in_A x_lt_q';
+ Refine LeRE;
+ 3 Refine Upper_BoundE A U' q';
+ Refine x_lt_q';
+ Refine xrat;
+ Refine q'_in_A;
+ Refine LtQratr;
+ Refine x_lt_q';
+ Refine U'ub;
+ ReturnAll;
+ Refine Upper_BoundI;
+ Intros q qrat q_in_A;
+ Refine LeRI;
+ Intros x xrat x_lt_q;
+ Refine ExI Int2 ([q' : Int2] And (In Int2 q' A) (LtQ x q')) q;
+ Refine AndI;
+ Refine x_lt_q;
+ Refine q_in_A;
+ ReturnAll;
+ Refine RealI;
+ 6 Refine u;
+ Refine NotI;
+ Refine ExE Int2 ([q' : Int2] And (In Int2 q' A) (LtQ u q'));
+ Intros q;
+ Refine AndE;
+ Intros q_in_A u_lt_q;
+ Refine LtQ_irref;
+ Refine LtQ_trans;
+ 2 Refine u_lt_q;
+ Refine uub;
+ Refine q_in_A;
+ Refine LtQratr;
+ Refine u_lt_q;
+ ReturnAll;
+ Refine urat;
+ 4 Refine (plusQ w (minusQ one));
+ Refine ExI Int2 ([q : Int2] And (In Int2 q A) (LtQ (plusQ w (minusQ one)) q));
+ 2 Refine w;
+ Refine AndI;
+ Refine LtQwdr;
+ 4 Refine (plusQ w zero);
+ Refine LtQ_plusQl w (minusQ one) zero;
+ Refine ZtoQLt (minusZ one) zero;
+ Refine LtI;
+ 2 Refine zero;
+ Refine EqI;
+ Refine wrat;
+ Refine plusQ_zero;
+ Refine wrat;
+ Refine winA;
+ Refine plusQtotal w (minusQ one);
+ Refine minusQtotal one;
+ Refine ZtoQtotal;
+ Refine one;
+ Refine wrat;
+ Refine Open_CutI;
+ Intros q qrat;
+ Refine ExE Int2 [q' : Int2] And (In Int2 q' A) (LtQ q q');
+ Intros q';
+ Refine AndE;
+ Intros q'_in_A q_lt_q';
+ Refine ExI;
+ 2 Refine (mean q q');
+ Refine AndI;
+ 2 Refine LtQ_dense;
+ 2 Refine q_lt_q';
+ Refine ExI Int2 ([q'' : Int2] And (In Int2 q'' A) (LtQ (mean q q') q'')) q';
+ Refine AndI;
+ Refine LtQ_dense';
+ Refine q_lt_q';
+ Refine q'_in_A;
+ ReturnAll;
+ Refine CuttI;
+ Intros q r q_lt_r;
+ Refine ExE Int2 [q' : Int2] And (In Int2 q' A) (LtQ r q');
+ Intros q';
+ Refine AndE;
+ Intros q'_in_A r_lt_q';
+ Refine ExI Int2 [q' : Int2] And (In Int2 q' A) (LtQ q q');
+ 2 Refine q';
+ Refine AndI;
+ Refine LtQ_trans q r q';
+ Refine r_lt_q';
+ Refine q_lt_r;
+ Refine q'_in_A;
+ ReturnAll;
+ Refine DomRatI;
+ Intros q r qrat rrat q_is_r;
+ Refine ExE Int2 [q' : Int2] And (In Int2 q' A) (LtQ q q');
+ Intros q';
+ Refine AndE;
+ Intros q'_in_A q_lt_q';
+ Refine ExI Int2 [q' : Int2] And (In Int2 q' A) (LtQ r q');
+ 2 Refine q';
+ Refine AndI;
+ Refine LtQwdl;
+ Refine q_lt_q';
+ Refine q_is_r;
+ Refine rrat;
+ Refine q'_in_A;
+ ReturnAll;
+
+Every set of rationals bounded below has a unique greatest lower bound
+
+> [lower_bound [A : Set Int2] [L : SInt2] = all int2 [Q : ?] imp (rational Q) (imp (in ? Q A) (leR L Q))];
+> [Lower_Bound [A : Set Int2] [L : SInt2] = All Int2 [Q : ?] Imp (Rational Q) (Imp (In ? Q A) (LeR L Q))];
+
+> [Thm9_11' : (A : Set Int2) (Q : Int2) DomRat A -> Rational Q -> ((R : ?) Rational R -> In ? R A -> LtQ Q R) ->
+>   Ex1 [I : ?] And (Lower_Bound A I)
+>   (All ? [L : ?] Imp (Real L) (Imp (Lower_Bound A L) (LeR L I)))];
+
+Every bounded infinite set of rationals has an accumulation point
+
+> [Thm9_12 : (M : Set Int2) (Q, Q' : Int2) (f : Nat -> Int2) DomRat M -> Rational Q -> Rational Q' -> ((n : Nat) Rational (f n)) ->
+>   ((R : Int2) Rational R -> In ? R M -> LtQ Q R) ->
+>   ((R : Int2) Rational R -> In ? R M -> LtQ R Q') ->
+>   ((n : Nat) In ? (f n) M) ->
+>   ((m, n : Nat) EqR (f m) (f n) -> Eq nat m n) ->
+>   Ex1 [C : ?] All ? [epsilon : ?] Imp (LtQ zero epsilon) (Ex ? [R : ?] And (Rational R)
+>     (And (In ? R M) (LtR (dist C R) epsilon)))];
+
+> [in_unit_int [X : SInt2] = and (real X)
+>   (and (leR zero X) (leR X one))];
+> [In_Unit_Int [X : SInt2] = And (Real X) (And (LeR zero X) (LeR X one))];
+
+Heine-Borel Theorem
+
+Consider a sequence of open intervals Delta(n).  Let every real number in the unit interval [0,1] lie in the interior of some Delta(n).
+Then there exists a natural number n such that every such real lies in one of Delta(0), Delta(1), ..., Delta(n).
+
+> [Heine_Borel : (f, g : Nat -> SInt2) ((n : Nat) Real (f n)) -> ((n : Nat) Real (g n)) ->
+>   ((n : Nat) LtR (f n) (g n)) ->
+>   ((X : SInt2) In_Unit_Int X -> Ex Nat [n : Nat] And (LtR (f n) X) (LtR X (g n))) ->
+>   Ex Nat [n : Nat] All ? [X : ?] Imp (In_Unit_Int X) (Ex Nat [k : Nat] And (Lt k n) (And (LtR (f k) X) (LtR X (g k))))];
+
+Infinite Series
+
+The sum from i = 0 to n of (t i)
+
+> [partsum [t : Nat -> SInt2] = E_Nat ([_ : Nat] SInt2) (t zero)
+>   [n : Nat] [X : SInt2] plusR X (t (succ n))];
+
+The sum from i = 0 to infty of (t i)
+
+> [sum [t : Nat -> SInt2] = liminf (partsum t)];
+
+----------------------------------------
+
+Continuous Functions
+
+The proposition "f is a function on the unit interval":
+
+> [RealFunc [f : SInt2 -> SInt2] =
+>   And (All SInt2 [X : SInt2]
+>   Imp (In_Unit_Int X)
+>   (Real (f X)))
+>   (All SInt2 [X : SInt2] All SInt2 [Y : SInt2]
+>    Imp (In_Unit_Int X) (Imp (In_Unit_Int Y)
+>     (Imp (EqR X Y) (EqR (f X) (f Y)))))];
+
+> [RealFuncE : (f : SInt2 -> SInt2) (X : SInt2) RealFunc f -> In_Unit_Int X -> Real (f X)];
+ Intros f X frf;
+ Refine ImpE;
+ Refine AllE ? ? X (AndE1 ? ? frf);
+ ReturnAll;
+ RealFuncE;
+
+> [RealFuncwd : (f : SInt2 -> SInt2) (X, Y : SInt2) RealFunc f -> In_Unit_Int X -> In_Unit_Int Y -> EqR X Y -> EqR (f X) (f Y)];
+ Intros f X Y frf Xinunit Yinunit;
+ Refine ImpE;
+ Refine ImpE;
+ Refine Yinunit;
+ Refine ImpE;
+ Refine Xinunit;
+ Refine AllE ? ? Y (AllE ? ? X (AndE2 ? ? frf));
+ ReturnAll;
+ RealFuncwd;
+
+The proposition "f is a function on the unit interval continuous at A":
+
+> [ContAt [f : SInt2 -> SInt2] [A : SInt2] =
+>   And (RealFunc f)
+>    (And (In_Unit_Int A)
+>     (All ? [epsilon : Int2] Imp (LtQ zero epsilon)
+>      (Ex ? [delta : Int2] And (LtQ zero delta)
+>        (All SInt2 [X : SInt2] Imp (In_Unit_Int X) (Imp (LeR (dist X A) delta)
+>          (LeR (dist (f X) (f A)) epsilon))))))];
+
+> [ContAtfunc : (f : SInt2 -> SInt2) (A : SInt2) ContAt f A -> RealFunc f];
+ Intros f A;
+ Refine AndE1;
+ ReturnAll;
+ ContAtfunc;
+
+> [ContAtUnitInt : (f : SInt2 -> SInt2) (A : SInt2) ContAt f A -> In_Unit_Int A];
+ Intros f A;
+ Refine AndE;
+ Intros _;
+ Refine AndE1;
+ ReturnAll;
+ ContAtReal;
+
+> [ContAtE : (f : SInt2 -> SInt2) (A : SInt2) (epsilon : Int2) (P : Prop) ContAt f A -> LtQ zero epsilon ->
+>   ((delta : Int2) LtQ zero delta -> ((X : SInt2) In_Unit_Int X -> LeR (dist X A) delta -> LeR (dist (f X) (f A)) epsilon) -> P)
+>     -> P];
+ Intros f A epsilon P fcontA epsilonpos H;
+ Refine ExE;
+ Refine ImpE (LtQ zero epsilon);
+ Refine epsilonpos;
+ 4 Refine Int2;
+ Refine AllE Int2 ? epsilon (AndE2 ? ? (AndE2 ? ? fcontA));
+ Intros delta;
+ Refine AndE;
+ Intros deltapos K;
+ Refine H;
+ 2 Refine deltapos;
+ Intros X Xinunit;
+ Refine ImpE;
+ Refine ImpE ? ? ? Xinunit;
+ Refine AllE ? ? X K;
+ ReturnAll;
+
+The proposition "f is a function continuous on the unit interval"
+
+> [Cont [f : SInt2 -> SInt2] =
+>   All SInt2 [A : SInt2]
+>   Imp (In_Unit_Int A) (ContAt f A)];
+
+> [ContE : (f : SInt2 -> SInt2) (A : SInt2) Cont f -> In_Unit_Int A -> ContAt f A];
+ Intros f A fcont;
+ Refine ImpE;
+ Refine AllE ? ? ? fcont;
+ ReturnAll;
+
+> [Contfunc : (f : SInt2 -> SInt2) Cont f -> RealFunc f];
+ Intros f fcont;
+ Refine ContAtfunc f zero;
+ Refine ContE;
+ Refine AndI;
+ Refine AndI;
+ Refine N2RLe zero one;
+ Expand Le;
+ Refine ExI;
+ 2 Refine one;
+ Refine EqI;
+ Refine LeR_ref;
+ Refine ZtoRtotal zero;
+ Refine fcont;
+ ReturnAll;
+
+The proposition "f is uniformly continuous on the unit interval"
+
+ [UnifCont [f : SInt2 -> SInt2] =
+   And (RealFunc f)
+   (All Int2 [epsilon : Int2] Imp (LtQ zero epsilon)
+    (Ex Int2 [delta : Int2] And (LtQ zero delta)
+     (All SInt2 [X : SInt2] Imp (In_Unit_Int X)
+      (All SInt2 [Y : SInt2] Imp (In_Unit_Int Y)
+       (Imp (LeR (dist X Y) delta)
+        (LeR (dist (f X) (f Y)) epsilon))))))];
+
+Intermediate Value Theorem
+
+Two lemmas needed for a continuous function f:
+
+1.  If f is continuous at X < A <= 1 and f(X) < Y, there exists a rational X < q < A such that f(q) < Y.
+
+2.  If f is continuous at X > A >= 0 and f(X) > Y, there exists a rational A < q < X such that, for all rational r between q and X, f(r) > Y.
+
+> [IVTlm1 : (f : SInt2 -> SInt2) (A, X, Y : SInt2) (P : Prop) Real A -> Real Y -> ContAt f X -> LtR X A -> LeR A one -> LtR (f X) Y ->
+>   ((q : Int2) Rational q -> LtR X q -> In ? q A -> LtR (f q) Y -> P) -> P];
+ Intros f A X Y P Areal Yreal fcontX XltA Ale1 fXltY H;
+ Claim Xinunitint : In_Unit_Int X;
+ Refine ContAtUnitInt f;
+ Refine fcontX;
+ Claim fXreal : Real (f X);
+ Refine RealFuncE f X;
+ Refine Xinunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine ExE Int2;
+ Refine LtR_dense zero (plusR Y (minusR (f X)));
+ Refine LtRwdl (plusR Y (minusR Y));
+ Refine LtR_plusRr Y (minusR Y) (minusR (f X));
+ Refine LtR_minusR;
+ Refine fXltY;
+ Refine Yreal;
+ Refine fXreal;
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine Yreal;
+ Refine plusR_minusR;
+ Refine Yreal;
+ Refine plusRtotal Y (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine Yreal;
+ Refine ZtoRtotal zero;
+ Intros epsilon;
+ Refine AndE;
+ Intros epsilonrat;
+ Refine AndE;
+ Intros epsilonpos epsilonLtYminfX;
+ Refine ContAtE f X epsilon;
+ Intros delta1 delta1pos delta1prop;
+ Claim Xreal : Real X;
+ Refine AndE1;
+ Refine ContAtUnitInt f X fcontX;
+ Refine ExE Int2;
+ Refine LtR_dense X (min A (plusR X delta1));
+ Refine min_greatest' X A (plusR X delta1);
+ Refine LtRwdl;
+ Refine LtR_plusRr X zero delta1;
+ Refine Q2RLt zero;
+ Refine delta1pos;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine ZtoRtotal zero;
+ Refine Xreal;
+ Refine plusR_zero;
+ Refine Xreal;
+ Refine XltA;
+ Refine mintotal A (plusR X delta1);
+ Refine plusRtotal X delta1;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine Xreal;
+ Refine Areal;
+ Refine Xreal;
+ Intros q;
+ Refine AndE;
+ Intros qrat;
+ Refine AndE;
+ Intros Xltq qltAXdelta1;
+ Claim fXreal : Real (f X);
+ Refine RealFuncE f;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Claim Xreal : Real X;
+ Refine AndE1;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Claim qinunitint: In_Unit_Int q;
+ Refine AndI;
+ Refine AndI;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine LeR_trans;
+ Refine Ale1;
+ Refine ge_minl A (plusR X delta1);
+ Refine qltAXdelta1;
+ Refine LtR_LeR;
+ Refine LeR_LtR_trans;
+ Refine Xltq;
+ Refine AndE1;
+ Refine AndE2;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Refine QtoRtotal;
+ Refine qrat;
+ Claim fqreal : Real (f q);
+ Refine RealFuncE f;
+ Refine qinunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine H q;
+ Refine LeR_LtR_trans (f q) (plusR (f X) epsilon);
+ Refine LtRwdr;
+ Refine LtR_plusRr (f X) epsilon (plusR Y (minusR (f X)));
+ Refine epsilonLtYminfX;
+ Refine plusRtotal Y (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine Yreal;
+ Refine QtoRtotal;
+ Refine epsilonrat;
+ Refine fXreal;
+ Refine EqR_trans ? (plusR (plusR (f X) Y) (minusR (f X)));
+ Refine EqR_trans ? (plusR (plusR Y (f X)) (minusR (f X)));
+ Refine EqR_trans ? (plusR Y (plusR (f X) (minusR (f X))));
+ Refine EqR_trans ? (plusR Y zero);
+ Refine plusR_zero;
+ Refine Yreal;
+ Refine plusRwdr Y (plusR (f X) (minusR (f X))) zero;
+ Refine plusR_minusR;
+ Refine fXreal;
+ Refine plusR_assocr Y (f X) (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fXreal;
+ Refine Yreal;
+ Refine plusRwdl (plusR (f X) Y) (plusR Y (f X)) (minusR (f X));
+ Refine plusR_comm;
+ Refine Yreal;
+ Refine fXreal;
+ Refine plusR_assocl (f X) Y (minusR (f X)) fXreal Yreal;
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine LeRwdl;
+ Refine LeR_plusRr (f X) (plusR (f q) (minusR (f X))) epsilon;
+ Refine LeR_trans;
+ Refine delta1prop q;
+ Refine max_least (plusR q (minusR X)) (plusR X (minusR q)) delta1;
+ Refine LtR_LeR;
+ Refine LtR_trans;
+ Refine Q2RLt zero;
+ Refine delta1pos;
+ Refine LtRwdr;
+ Refine LtR_plusRl X q (minusR q);
+ Refine Xltq;
+ Refine minusRtotal q;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine Xreal;
+ Refine plusR_minusR q;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine LtR_LeR;
+ Refine LtRwdr;
+ Refine LtR_plusRl q (plusR X delta1) (minusR X);
+ Refine LtR_LeR_trans;
+ Refine ge_minr A;
+ Refine qltAXdelta1;
+ Refine minusRtotal;
+ Refine Xreal;
+ Refine plusRtotal X delta1;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine Xreal;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine EqR_trans ? (plusR (plusR delta1 X) (minusR X));
+ Refine EqR_trans ? (plusR delta1 (plusR X (minusR X)));
+ Refine EqR_trans ? (plusR delta1 zero);
+ Refine plusR_zero;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine plusRwdr delta1 (plusR X (minusR X)) zero;
+ Refine plusR_minusR;
+ Refine Xreal;
+ Refine plusR_assocr delta1 X (minusR X);
+ Refine minusRtotal;
+ Refine Xreal;
+ Refine Xreal;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine plusRwdl (plusR X delta1) (plusR delta1 X) (minusR X);
+ Refine plusR_comm X delta1;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine delta1pos;
+ Refine Xreal;
+ Refine qinunitint;
+ Refine le_maxl (plusR (f q) (minusR (f X))) (plusR (f X) (minusR (f q)));
+ Refine QtoRtotal;
+ Refine epsilonrat;
+ Refine plusRtotal (f q) (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fqreal;
+ Refine fXreal;
+ Refine EqR_trans ? (plusR (f X) (plusR (minusR (f X)) (f q)));
+ Refine EqR_trans ? (plusR (plusR (f X) (minusR (f X))) (f q));
+ Refine EqR_trans ? (plusR zero (f q));
+ Refine EqR_trans ? (plusR (f q) zero);
+ Refine plusR_zero;
+ Refine fqreal;
+ Refine plusR_comm zero (f q);
+ Refine fqreal;
+ Refine ZtoRtotal zero;
+ Refine plusRwdl (plusR (f X) (minusR (f X))) zero;
+ Refine plusR_minusR;
+ Refine fXreal;
+ Refine plusR_assocl (f X) (minusR (f X));
+ Refine fqreal;
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fXreal;
+ Refine plusRwdr (f X) (plusR (f q) (minusR (f X))) (plusR (minusR (f X)) (f q));
+ Refine plusR_comm (f q) (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fqreal;
+ Refine Lt_In;
+ Refine LtR_LeR_trans;
+ Refine ge_minl A (plusR X delta1);
+ Refine qltAXdelta1;
+ Refine Areal;
+ Refine qrat;
+ Refine Xltq;
+ Refine qrat;
+ ReturnAll;
+ Refine Q2RLt';
+ Refine epsilonpos;
+ Refine fcontX;
+ ReturnAll;
+> IVTlm1;
+
+> [IVTlm2 : (f : SInt2 -> SInt2) (A, X, Y : SInt2) (P : Prop) Real A -> Real Y -> LeR zero A -> LtR A X -> ContAt f X -> LtR Y (f X) ->
+>   ((q : Int2) LtR A q -> In ? q X -> ((r : Int2) LtQ q r -> In ? r X -> LtR Y (f r)) -> P) -> P];
+
+ Claim IVTlm2 : (f : SInt2 -> SInt2) (A, X, Y : SInt2) (P : Prop) Real A -> Real Y -> LeR zero A -> LtR A X -> ContAt f X -> LtR Y (f X) ->
+   ((q : Int2) LtR A q -> In ? q X -> ((r : Int2) LtQ q r -> In ? r X -> LtR Y (f r)) -> P) -> P;
+ Intros f A X Y P Areal Yreal zeroleA AltX fcontX YltfX H;
+ Claim Xinunitint : In_Unit_Int X;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Claim fXreal : Real (f X);
+ Refine RealFuncE f;
+ Refine Xinunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine ExE Int2;
+ Refine LtR_dense zero (plusR (f X) (minusR Y));
+ Refine LtRwdl;
+ Refine LtR_plusRl Y (f X) (minusR Y);
+ Refine YltfX;
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine fXreal;
+ Refine Yreal;
+ Refine plusR_minusR;
+ Refine Yreal;
+ Refine plusRtotal (f X) (minusR Y);
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine fXreal;
+ Refine ZtoRtotal zero;
+ Intros epsilon;
+ Refine AndE;
+ Intros epsilonrat;
+ Refine AndE;
+ Intros epsilonpos epsilonltfXY;
+ Refine ContAtE f X epsilon;
+ Intros delta deltapos deltaprop;
+ Claim Xreal : Real X;
+ Refine AndE1;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Refine ExE Int2;
+ Refine LtR_dense (max A (plusR X (minusR delta))) X;
+ Refine max_least' A (plusR X (minusR delta));
+ Refine LtRwdr;
+ Refine LtR_plusRr X (minusR delta) zero;
+ Refine LtRwdr;
+ Refine LtR_minusR zero delta;
+ Refine Q2RLt zero delta;
+ Refine deltapos;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine deltapos;
+ Refine ZtoRtotal zero;
+ Refine minusR_zero;
+ Refine ZtoRtotal zero;
+ Refine minusRtotal delta;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine deltapos;
+ Refine Xreal;
+ Refine plusR_zero;
+ Refine Xreal;
+ Refine AltX;
+ Refine Xreal;
+ Refine maxtotal A (plusR X (minusR delta));
+ Refine plusRtotal X (minusR delta);
+ Refine minusRtotal delta;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine deltapos;
+ Refine Xreal;
+ Refine Areal;
+ Intros q;
+ Refine AndE;
+ Intros qrat;
+ Refine AndE;
+ Intros maxltq qltX;
+ Refine H q;
+ Intros q' qltq' q'inX;
+ Claim q'rat : Rational q';
+ Refine LtQratr;
+ Refine qltq';
+ Claim Xinunitint : In_Unit_Int X;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Claim Xreal : Real X;
+ Refine AndE1;
+ Refine Xinunitint;
+ Claim q'inunitint : In_Unit_Int q';
+ Refine AndI;
+ Refine AndI;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine AndE2;
+ Refine AndE2;
+ Refine Xinunitint;
+ Refine In_Lt;
+ Refine q'inX;
+ Refine Xreal;
+ Refine q'rat;
+ Refine LtR_LeR;
+ Refine LtR_trans;
+ Refine Q2RLt q;
+ Refine qltq';
+ Claim deltarat : Rational delta;
+ Refine LtQratr;
+ Refine deltapos;
+ Claim deltareal : Real delta;
+ Refine QtoRtotal;
+ Refine deltarat;
+ Claim zeroltq : LtR zero q;
+ Refine LeR_LtR_trans;
+ Refine maxltq;
+ Refine LeR_trans;
+ Refine le_maxl A (plusR X (minusR delta));
+ Refine zeroleA;
+ Claim qinunitint : In_Unit_Int q;
+ Refine AndI;
+ Refine AndI;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine AndE2;
+ Refine AndE2;
+ Refine Xinunitint;
+ Refine qltX;
+ Refine LtR_LeR;
+ Refine zeroltq;
+ Refine QtoRtotal;
+ Refine qrat;
+ Claim fXreal : Real (f X);
+ Refine RealFuncE f;
+ Refine Xinunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine zeroltq;
+ Refine QtoRtotal;
+ Refine q'rat;
+ Refine LtR_minusR';
+ Refine LtRwd;
+ Refine LtR_plusRl (plusR (f X) (minusR (f q'))) (plusR (f X) (minusR Y)) (minusR (f X));
+ Refine LeR_LtR_trans;
+ Refine epsilonltfXY;
+ Refine LeR_trans;
+ Refine deltaprop q';
+ Refine LtR_LeR;
+ Refine max_least' (plusR q' (minusR X)) (plusR X (minusR q'));
+ Refine LtR_trans ? (plusR X (minusR q));
+ Refine LtRwdr;
+ Refine LtR_plusRr X (minusR q) (minusR (plusR X (minusR delta)));
+ Refine LtR_minusR (plusR X (minusR delta)) q;
+ Refine LeR_LtR_trans;
+ Refine maxltq;
+ Refine le_maxr;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine plusRtotal X (minusR delta);
+ Refine minusRtotal delta;
+ Refine deltareal;
+ Refine Xreal;
+ Refine minusRtotal (plusR X (minusR delta));
+ Refine plusRtotal X (minusR delta);
+ Refine minusRtotal delta;
+ Refine deltareal;
+ Refine Xreal;
+ Refine minusRtotal q;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine Xreal;
+ Refine EqR_trans ? (plusR X (plusR (minusR X) delta));
+ Refine EqR_trans ? (plusR (plusR X (minusR X)) delta) delta;
+ Refine EqR_trans ? (plusR zero delta);
+ Refine EqR_trans ? (plusR delta zero);
+ Refine plusR_zero;
+ Refine deltareal;
+ Refine plusR_comm zero delta;
+ Refine deltareal;
+ Refine ZtoRtotal zero;
+ Refine plusRwdl (plusR X (minusR X)) zero delta;
+ Refine plusR_minusR;
+ Refine Xreal;
+ Refine plusR_assocl X (minusR X) delta;
+ Refine deltareal;
+ Refine minusRtotal;
+ Refine Xreal;
+ Refine Xreal;
+ Refine plusRwdr X (minusR (plusR X (minusR delta))) (plusR (minusR X) delta);
+ Refine EqR_trans ? (plusR delta (minusR X));
+ Refine plusR_comm delta (minusR X);
+ Refine minusRtotal;
+ Refine Xreal;
+ Refine deltareal;
+ Refine minusRminus X delta;
+ Refine deltareal;
+ Refine Xreal;
+ Refine LtR_plusRr X (minusR q') (minusR q);
+ Refine LtR_minusR q q';
+ Refine Q2RLt;
+ Refine qltq';
+ Refine QtoRtotal;
+ Refine q'rat;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine minusRtotal q;
+ Refine QtoRtotal;
+ Refine qrat;
+ Refine minusRtotal q';
+ Refine QtoRtotal;
+ Refine q'rat;
+ Refine Xreal;
+ Refine LtR_trans;
+ Refine Q2RLt zero;
+ Refine deltapos;
+ Refine LtRwdr;
+ Refine LtR_plusRl q' X (minusR X);
+ Refine In_Lt;
+ Refine q'inX;
+ Refine Xreal;
+ Refine q'rat;
+ Refine minusRtotal;
+ Refine Xreal;
+ Refine Xreal;
+ Refine QtoRtotal;
+ Refine q'rat;
+ Refine plusR_minusR;
+ Refine Xreal;
+ Refine q'inunitint;
+ Refine le_maxr (plusR (f q') (minusR (f X))) (plusR (f X) (minusR (f q')));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine plusRtotal (f X) (minusR Y);
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine fXreal;
+ Refine plusRtotal (f X) (minusR (f q'));
+ Refine minusRtotal;
+ Refine RealFuncE f;
+ Refine q'inunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine fXreal;
+ Refine EqR_trans ? (plusR (plusR (minusR Y) (f X)) (minusR (f X)));
+ Refine EqR_trans ? (plusR (minusR Y) (plusR (f X) (minusR (f X))));
+ Refine EqR_trans ? (plusR (minusR Y) zero);
+ Refine plusR_zero;
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine plusRwdr (minusR Y) (plusR (f X) (minusR (f X))) zero;
+ Refine plusR_minusR;
+ Refine fXreal;
+ Refine plusR_assocr (minusR Y) (f X) (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fXreal;
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine plusRwdl (plusR (f X) (minusR Y)) (plusR (minusR Y) (f X)) (minusR (f X));
+ Refine plusR_comm (f X) (minusR Y);
+ Refine minusRtotal;
+ Refine Yreal;
+ Refine fXreal;
+ Claim fq'real : Real (f q');
+ Refine RealFuncE f;
+ Refine q'inunitint;
+ Refine ContAtfunc;
+ Refine fcontX;
+ Refine EqR_trans ? (plusR (plusR (minusR (f q')) (f X)) (minusR (f X)));
+ Refine EqR_trans ? (plusR (minusR (f q')) (plusR (f X) (minusR (f X))));
+ Refine EqR_trans ? (plusR (minusR (f q')) zero);
+ Refine plusR_zero;
+ Refine minusRtotal;
+ Refine fq'real;
+ Refine plusRwdr (minusR (f q')) (plusR (f X) (minusR (f X))) zero;
+ Refine plusR_minusR;
+ Refine fXreal;
+ Refine plusR_assocr (minusR (f q')) (f X) (minusR (f X));
+ Refine minusRtotal;
+ Refine fXreal;
+ Refine fXreal;
+ Refine minusRtotal;
+ Refine fq'real;
+ Refine plusRwdl (plusR (f X) (minusR (f q'))) (plusR (minusR (f q')) (f X)) (minusR (f X));
+ Refine plusR_comm (f X) (minusR (f q'));
+ Refine minusRtotal;
+ Refine fq'real;
+ Refine fXreal;
+ Refine Yreal;
+ Refine fq'real;
+ ReturnAll;
+ Refine Lt_In;
+ Refine qltX;
+ Refine AndE1;
+ Refine ContAtUnitInt;
+ Refine fcontX;
+ Refine qrat;
+ Refine LeR_LtR_trans;
+ Refine maxltq;
+ Refine le_maxl A (plusR X (minusR delta));
+ ReturnAll;
+ Refine Q2RLt';
+ Refine epsilonpos;
+ Refine fcontX;
+ ReturnAll;
+> IVTlm2;
+
+> [IVT : (f : SInt2 -> SInt2) (A, B, Y : SInt2) Cont f -> Real A -> Real B -> Real Y ->
+>   LeR zero A -> LtR A B -> LeR B one ->
+>   LtR (f A) Y -> LtR Y (f B) ->
+>   Ex ? [X : ?] And (Real X) (And (LtR A X) (And (LtR X B) (EqR (f X) Y)))];
+
+ Claim IVT : (f : SInt2 -> SInt2) (A, B, Y : SInt2) Cont f -> Real A -> Real B -> Real Y ->
+   LeR zero A -> LtR A B -> LeR B one ->
+   LtR (f A) Y -> LtR Y (f B) ->
+   Ex ? [X : ?] And (Real X) (And (LtR A X) (And (LtR X B) (EqR (f X) Y)));
+ Intros f A B Y fcont Areal Breal Yreal zero_le_A A_lt_B B_le_one fA_lt_Y Y_lt_fB;
+ [X = set Int2 [l : Int2] ex int2 [l' : Int2] and (ltQ l l') (and (in ? l' B) (ltR (f l') Y))];
+ Refine ExI SInt2;
+ 2 Refine X;
+ Refine AndI;
+ Claim AleX : LeR A X;
+ Refine LeRI;
+ Intros l lrat linA;
+ Refine IVTlm1 f B A Y;
+ 7 Refine Breal;
+ 6 Refine Yreal;
+ 3 Refine B_le_one;
+ Intros l' l'rat Altl' l'inB fl'lty;
+ Refine ExI Int2 [l' : Int2] And (LtQ l l') (And (In ? l' B) (LtR (f l') Y));
+ 2 Refine l';
+ Refine AndI;
+ Refine AndI;
+ Refine fl'lty;
+ Refine l'inB;
+ Refine LeRE A l' l;
+ Refine linA;
+ Refine lrat;
+ Refine LtR_LeR A l';
+ Refine Altl';
+ ReturnAll;
+ Refine fA_lt_Y;
+ Refine A_lt_B;
+ Refine ContE;
+ Refine AndI;
+ 3 Refine fcont;
+ 2 Refine Areal;
+ Refine AndI;
+ 2 Refine zero_le_A;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine B_le_one;
+ Refine A_lt_B;
+ ReturnAll;
+ Claim XleB : LeR X B;
+ Refine LeRI;
+ Intros l lrat;
+ Refine ExE Int2 [l' : Int2] And (LtQ l l') (And (In ? l' B) (LtR (f l') Y));
+ Intros l';
+ Refine AndE;
+ Intros lltl';
+ Refine AndE;
+ Intros l'inB _;
+ Refine CuttE;
+ Refine l'inB;
+ Refine lltl';
+ Refine Open_Cut_Cutt;
+ Refine Real_Open_Cut;
+ Refine Breal;
+ ReturnAll;
+ Claim Xreal : Real X;
+ Refine RealI;
+ 6 Refine one;
+ Refine NotI;
+ Intros one_in_X;
+ Refine LtQ_irref one;
+ Refine LeRE B one one;
+ Refine LeRE X B one;
+ Refine one_in_X;
+ Refine ZtoQtotal one;
+ Refine XleB;
+ Refine ZtoQtotal one;
+ Refine B_le_one;
+ ReturnAll;
+ Refine ZtoQtotal one;
+ 4 Refine (minusQ one);
+ Refine LeRE A X (minusQ one);
+ Refine LeRE zero A (minusQ one);
+ Refine minusone_LtQ_zero;
+ Refine ZtoQtotal (minusZ one);
+ Refine zero_le_A;
+ Refine ZtoQtotal (minusZ one);
+ Refine AleX;
+ Refine ZtoQtotal (minusZ one);
+ Refine Open_CutI;
+ Intros l lrat;
+ Refine ExE Int2 [l' : Int2] And (LtQ l l') (And (In Int2 l' B) (LtR (f l') Y));
+ Intros l';
+ Refine AndE;
+ Intros lltl' H;
+ Refine ExI ? ? (mean l l');
+ Refine AndI;
+ Refine ExI Int2 ([x : Int2] And (LtQ (mean l l') x) (And (In Int2 x B) (LtR (f x) Y))) l';
+ Refine AndI;
+ Refine H;
+ Refine LtQ_dense';
+ Refine lltl';
+ Refine LtQ_dense;
+ Refine lltl';
+ ReturnAll;
+ Refine CuttI;
+ Intros q r qltr;
+ Refine ExE Int2 [l' : Int2] And (LtQ r l') (And (In Int2 l' B) (LtR (f l') Y));
+ Intros l';
+ Refine AndE;
+ Intros rltl' H;
+ Refine ExI Int2 ([l' : Int2] And (LtQ q l') (And (In Int2 l' B) (LtR (f l') Y))) l';
+ Refine AndI;
+ Refine H;
+ Refine LtQ_trans q r l';
+ Refine rltl';
+ Refine qltr;
+ ReturnAll;
+ Refine DomRatI;
+ Intros q r qrat rrat qisr;
+ Refine ExE Int2 [l' : Int2] And (LtQ q l') (And (In Int2 l' B) (LtR (f l') Y));
+ Intros l';
+ Refine AndE;
+ Intros qltl' H;
+ Refine ExI Int2 ([l' : Int2] And (LtQ r l') (And (In Int2 l' B) (LtR (f l') Y))) l';
+ Refine AndI;
+ Refine H;
+ Refine LtQwdl;
+ Refine qltl';
+ Refine qisr;
+ Refine rrat;
+ ReturnAll;
+ 2 Refine Xreal;
+ Claim Xinunitint : In_Unit_Int X;
+ Refine AndI;
+ Refine AndI;
+ Refine LeR_trans;
+ Refine B_le_one;
+ Refine XleB;
+ Refine LeR_trans;
+ Refine AleX;
+ Refine zero_le_A;
+ Refine Xreal;
+ Claim fXisY : EqR (f X) Y;
+ Refine OrE;
+ Refine LtR_trichotomy (f X) Y;
+ Refine Yreal;
+ Refine RealFuncE f X;
+ Refine Xinunitint;
+ Refine Contfunc;
+ Refine fcont;
+ Refine OrE;
+ Intros YltfX;
+ Refine IVTlm2 f zero X Y;
+ 7 Refine ZtoRtotal zero;
+ 6 Refine Yreal;
+ 5 Refine LeR_ref;
+ Intros q qpos qinX qprop;
+ Refine ExE Int2 ([q' : Int2] And (LtQ q q') (And (In Int2 q' B) (LtR (f q') Y)));
+ Refine qinX;
+ Intros q';
+ Refine AndE;
+ Intros qltq';
+ Refine AndE;
+ Intros q'inB fq'ltY; 
+ Refine LtR_assym' (f q') Y;
+ 2 Refine fq'ltY;
+ Refine qprop;
+ Refine IVTlm1 f B q' Y;
+ 7 Refine Breal;
+ 6 Refine Yreal;
+ 3 Refine B_le_one;
+ Intros q'' q''rat q'ltq'' q''inB fq''ltY;
+ Refine ExI Int2 ([q'' : Int2] And (LtQ q' q'') (And (In Int2 q'' B) (LtR (f q'') Y))) q'';
+ Refine AndI;
+ Refine AndI;
+ Refine fq''ltY;
+ Refine q''inB;
+ Refine Q2RLt' q' q'';
+ Refine q'ltq'';
+ ReturnAll;
+ Refine fq'ltY;
+ Refine In_Lt;
+ Refine q'inB;
+ Refine Breal;
+ Refine LtQratr;
+ Refine qltq';
+ Refine ContE;
+ Refine AndI;
+ Refine AndI;
+ Refine Q2RLe q' one;
+ Refine LtQ_LeQ;
+ Refine LeRE B one q';
+ Refine q'inB;
+ Refine LtQratr;
+ Refine qltq';
+ Refine B_le_one;
+ Refine LtR_LeR;
+ Refine LtR_trans zero q q';
+ Refine Q2RLt;
+ Refine qltq';
+ Refine qpos;
+ Refine QtoRtotal;
+ Refine LtQratr;
+ Refine qltq';
+ Refine fcont;
+ Refine qltq';
+ ReturnAll;
+ Refine YltfX;
+ Refine ContE;
+ Refine Xinunitint;
+ Refine fcont;
+ Refine AndI;
+ Refine NotI;
+ Intros zero_is_X;
+ Refine LtR_assym;
+ Refine YltfX;
+ Refine LtRwdl;
+ Refine fA_lt_Y;
+ Refine RealFuncwd f A X;
+ Refine LeR_antisym;
+ Refine LeRwdl;
+ Refine zero_le_A;
+ Refine zero_is_X;
+ Refine AleX;
+ Refine Xinunitint;
+ Refine AndI;
+ Refine AndI;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine B_le_one;
+ Refine A_lt_B;
+ Refine zero_le_A;
+ Refine Areal;
+ Refine Contfunc;
+ Refine fcont;
+ ReturnAll;
+ Refine LeR_trans;
+ Refine AleX;
+ Refine zero_le_A;
+ ReturnAll;
+ Intros fXisY;
+ Refine fXisY;
+ ReturnAll;
+ Intros fXltY;
+ Refine IVTlm1 f B X Y;
+ Intros q qrat Xltq qinB fqLtY;
+ Refine IVTlm1 f q X Y;
+ 7 Refine QtoRtotal;
+ 7 Refine qrat;
+ 6 Refine Yreal;
+ 3 Refine LtR_LeR;
+ 3 Refine LtR_LeR_trans;
+ 4 Refine In_Lt;
+ 4 Refine qinB;
+ 3 Refine B_le_one;
+ Intros q' q'rat Xltq' q'ltq fq'ltY;
+ Refine LtR_assym';
+ Refine Xltq';
+ Refine In_Lt;
+ Refine ExI Int2 ([q : Int2] And (LtQ q' q) (And (In Int2 q B) (LtR (f q) Y))) q;
+ Refine AndI;
+ Refine AndI;
+ Refine fqLtY;
+ Refine qinB;
+ Refine q'ltq;
+ Refine Xreal;
+ Refine q'rat;
+ ReturnAll;
+ Refine fXltY;
+ Refine Breal;
+ Refine qrat;
+ Refine Xltq;
+ Refine ContE;
+ Refine Xinunitint;
+ Refine fcont;
+ ReturnAll;
+ Refine fXltY;
+ Refine B_le_one;
+ Refine AndI;
+ Refine NotI;
+ Intros X_is_B;
+ Refine LtR_assym;
+ Refine fXltY;
+ Refine LtRwdr;
+ Refine Y_lt_fB;
+ Refine RealFuncwd f B X;
+ Refine EqR_sym;
+ Refine X_is_B;
+ Refine Xinunitint;
+ Refine AndI;
+ Refine AndI;
+ Refine B_le_one;
+ Refine LtR_LeR;
+ Refine LeR_LtR_trans;
+ Refine A_lt_B;
+ Refine zero_le_A;
+ Refine Breal;
+ Refine Contfunc;
+ Refine fcont;
+ ReturnAll;
+ Refine XleB;
+ Refine ContE;
+ Refine Xinunitint;
+ Refine fcont;
+ Refine Yreal;
+ Refine Breal;
+ ReturnAll;
+ Refine AndI;
+ Refine AndI;
+ Refine fXisY;
+ Refine AndI;
+ Claim XnotB : Not (EqR X B);
+ Refine NotI;
+ Intros XisB;
+ Refine LtR_irref;
+ Refine LtRwdl;
+ Refine Y_lt_fB;
+ Refine EqR_trans;
+ Refine RealFuncwd f X;
+ Refine XisB;
+ Refine AndI;
+ Refine AndI;
+ Refine B_le_one;
+ Refine LtR_LeR;
+ Refine LeR_LtR_trans;
+ Refine A_lt_B;
+ Refine zero_le_A;
+ Refine Breal;
+ Refine Xinunitint;
+ Refine Contfunc;
+ Refine fcont;
+ Refine EqR_sym;
+ Refine fXisY;
+ ReturnAll;
+ Refine XnotB;
+ Refine XleB;
+ Refine AndI;
+ Claim AnotX : Not (EqR A X);
+ Refine NotI;
+ Intros AisX;
+ Refine LtR_irref;
+ Refine LtRwdr;
+ Refine fA_lt_Y;
+ Refine EqR_trans;
+ Refine RealFuncwd f X;
+ Refine EqR_sym;
+ Refine AisX;
+ Refine AndI;
+ Refine AndI;
+ Refine LtR_LeR;
+ Refine LtR_LeR_trans;
+ Refine B_le_one;
+ Refine A_lt_B;
+ Refine zero_le_A;
+ Refine Areal;
+ Refine Xinunitint;
+ Refine Contfunc;
+ Refine fcont;
+ Refine EqR_sym;
+ Refine fXisY;
+ ReturnAll;
+ Refine AnotX;
+ Refine AleX;
+ ReturnAll;
+> IVT;
+
+A continuous function on the unit interval is bounded and attains its bounds
+
+> [Thm10_5 : (f : SInt2 -> SInt2) Cont f -> Ex ? [A : ?] Ex ? [B : ?] And (In_Unit_Int A) (And (In_Unit_Int B)
+>   (All ? [X : ?] Imp (In_Unit_Int X) (And (LeR (f A) (f X))
+>     (LeR (f X) (f B)))))];
+
+Every continuous function on the unit interval is uniformly continuous
+
+ [Thm10_6 : (f : SInt2 -> SInt2) Cont f -> UnifCont f];

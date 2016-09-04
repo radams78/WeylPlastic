@@ -1,0 +1,67 @@
+> module preorder where;
+
+> import ppreorder;
+
+> [preorder [A : Type][le : A -> A -> Prop] =
+>  And (reflexive A le) (transitive A le)];
+
+> [preorderI : (A : Type) (le : A -> A -> Prop)
+>  ((x : A) le x x) -> ((x,y,z : A) le x y -> le y z -> le x z) ->
+>  preorder A le];
+ Claim preorderI : (A : Type) (le : A -> A -> Prop)
+  ((x : A) le x x) -> ((x,y,z : A) le x y -> le y z -> le x z) ->
+  preorder A le;
+ Intros A le ref trans1;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine ImpI;
+ Refine AndE;
+ Refine trans1;
+ ReturnAll;
+ Refine AllI;
+ Refine ref;
+ ReturnAll;
+
+> [preorder_ref : (A : Type) (le : A -> A -> Prop) (a : A)
+>  preorder A le -> le a a];
+ Claim preorder_ref : (A : Type) (le : A -> A -> Prop) (a : A)
+  preorder A le -> le a a;
+ Intros A le a ord;
+ Refine AllE ? ? ? (AndE1 ? ? ord);
+ ReturnAll;
+
+> [preorder_trans : (A : Type) (le : A -> A -> Prop) (a,b,c : A)
+>  preorder A le -> le a b -> le b c -> le a c];
+ Claim preorder_trans : (A : Type) (le : A -> A -> Prop) (a,b,c : A)
+  preorder A le -> le a b -> le b c -> le a c;
+ Intros A le a b c ord a_le_b b_le_c;
+ Refine ImpE;
+ 2 Refine AllE ? ? c (AllE ? ? b (AllE ? ? a (AndE2 ? ? ord)));
+ Refine AndI;
+ Refine b_le_c;
+ Refine a_le_b;
+ ReturnAll;
+
+> [preorder_ppreorder : (A : Type) (le : A -> A -> Prop)
+>  preorder A le -> ppreorder A le];
+ Claim preorder_ppreorder : (A : Type) (le : A -> A -> Prop)
+  preorder A le -> ppreorder A le;
+ Intros A le ord;
+ Refine ppreorderI;
+ Intros _ _ _;
+ Refine preorder_ref A le;
+ Refine ord;
+ ReturnAll;
+ Intros _ _ _;
+ Refine preorder_ref A le;
+ Refine ord;
+ ReturnAll;
+ Intros _ _ _;
+ Refine preorder_trans A le;
+ Refine ord;
+ ReturnAll;

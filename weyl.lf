@@ -1,0 +1,415 @@
+> module weyl where;
+
+> [False : Prop];
+> [FalseE : (P : Prop) False -> P];
+
+> [Imp : Prop -> Prop -> Prop];
+> [ImpI : (P,Q : Prop) (P -> Q) -> Imp P Q];
+> [ImpE : (P,Q : Prop) Imp P Q -> P -> Q];
+
+> [Peirce : (P,Q : Prop) ((P -> Q) -> P) -> P];
+
+> [All : (A : Type) (A -> Prop) -> Prop];
+> [AllI : (A : Type) (P : A -> Prop) ((x : A) P x) -> All A P];
+> [AllE : (A : Type) (P : A -> Prop) (a : A) All A P -> P a];
+
+> [Not = [P : Prop] Imp P False];
+
+> Claim NotI : (P : Prop) (P -> False) -> Not P;
+> Intros P;
+> Refine ImpI;
+> ReturnAll;
+> NotI;
+
+> Claim NotE : (P : Prop) Not P -> P -> False;
+> Intros P;
+> Refine ImpE;
+> ReturnAll;
+> NotE;
+
+> Claim NotE' : (P, Q : Prop) Not P -> P -> Q;
+> Intros P Q notP p;
+> Refine FalseE;
+> Refine NotE P notP p;
+> ReturnAll;
+> NotE';
+
+> Claim cont : (P : Prop) (Not P -> False) -> P;
+> Intros P nPf;
+> Refine Peirce P False;
+> Intros PnP;
+> Refine FalseE;
+> Refine nPf;
+> Refine NotI;
+> Refine PnP;
+> ReturnAll;
+> cont;
+
+> Claim exmid : (P, Q : Prop) (P -> Q) -> (Not P -> Q) -> Q;
+> Intros P Q PQ nPQ;
+> Refine cont;
+> Intros nQ;
+> Refine NotE Q nQ;
+> Refine nPQ;
+> Refine NotI;
+> Intros p;
+> Refine NotE Q nQ;
+> Refine PQ;
+> Refine p;
+> ReturnAll;
+> exmid;
+
+> Claim contrapos : (P, Q : Prop) (Not P -> Q) -> Not Q -> P;
+> Intros P Q nPQ nQ;
+> Refine cont;
+> Intros nP;
+> Refine NotE;
+> 2 Refine nQ;
+> Refine nPQ;
+> Refine nP;
+> ReturnAll;
+> contrapos;
+
+> [True = Not False];
+
+> Claim TrueI : True;
+> Refine NotI;
+> Intros f;
+> Refine f;
+> ReturnAll;
+> TrueI;
+
+> [And = [P,Q : Prop] Not (Imp P (Not Q))];
+
+> Claim AndI : (P, Q : Prop) P -> Q -> And P Q;
+> Intros P Q p q;
+> Refine NotI;
+> Intros PnotQ;
+> Refine NotE Q;
+> Refine q;
+> Refine ImpE P;
+> Refine p;
+> Refine PnotQ;
+> ReturnAll;
+> AndI;
+
+> Claim AndE1 : (P, Q : Prop) And P Q -> P;
+> Intros P Q pq;
+> Refine Peirce P (Not Q);
+> Intros PnotQ;
+> Refine FalseE;
+> Refine NotE;
+> 2 Refine pq;
+> Refine ImpI;
+> Refine PnotQ;
+> ReturnAll;
+> AndE1;
+
+> Claim AndE2 : (P, Q : Prop) And P Q -> Q;
+> Intros P Q pq;
+> Refine Peirce Q (Not Q);
+> Intros QNotQ;
+> Refine cont;
+> Intros nQ;
+> Refine NotE;
+> 2 Refine pq;
+> Refine ImpI;
+> Intros p;
+> Refine nQ;
+> ReturnAll;
+> AndE2;
+
+> Claim AndE : (P, Q, R : Prop) (P -> Q -> R) -> And P Q -> R;
+> Intros P Q R H PQ;
+> Refine H;
+> Refine AndE2;
+> Refine PQ;
+> Refine AndE1;
+> Refine PQ;
+> ReturnAll;
+
+> [Or = [P, Q : Prop] Imp (Not P) Q];
+
+> Claim OrI1 : (P, Q : Prop) P -> Or P Q;
+> Intros P Q p;
+> Refine ImpI;
+> Intros nP;
+> Refine FalseE;
+> Refine NotE P;
+> Refine p;
+> Refine nP;
+> ReturnAll;
+> OrI1;
+
+> Claim OrI2 : (P, Q : Prop) Q -> Or P Q;
+> Intros P Q q;
+> Refine ImpI;
+> Intros nP;
+> Refine q;
+> ReturnAll;
+> OrI2;
+
+> Claim OrE : (P, Q, R : Prop) (P -> R) -> (Q -> R) -> Or P Q -> R;
+> Intros P Q R PR QR PorQ;
+> Refine exmid P;
+> 2 Refine PR;
+> Intros nP;
+> Refine QR;
+> Refine ImpE (Not P);
+> Refine nP;
+> Refine PorQ;
+> ReturnAll;
+> OrE;
+
+> [Iff = [P,Q : Prop] And (Imp P Q) (Imp Q P)];
+
+> Claim IffI : (P, Q : Prop) (P -> Q) -> (Q -> P) -> Iff P Q;
+> Intros P Q PQ QP;
+> Refine AndI;
+> Refine ImpI;
+> Refine QP;
+> Refine ImpI;
+> Refine PQ;
+> ReturnAll;
+> IffI;
+
+> Claim IffE1 : (P, Q : Prop) Iff P Q -> P -> Q;
+> Intros P Q PiffQ p;
+> Refine ImpE P;
+> Refine p;
+> Refine AndE1;
+> Refine PiffQ;
+> ReturnAll;
+> IffE1;
+
+> Claim IffE2 : (P, Q : Prop) Iff P Q -> Q -> P;
+> Intros P Q PiffQ q;
+> Refine ImpE Q;
+> Refine q;
+> Refine AndE2;
+> Refine PiffQ;
+> ReturnAll;
+> IffE2;
+
+> [Ex = [A : Type] [P : A -> Prop] Not (All A [x : A] Not (P x))];
+
+> Claim ExI : (A : Type) (P : A -> Prop) (a : A) P a -> Ex A P;
+> Intros A P a Pa;
+> Refine NotI;
+> Intros AllNotP;
+> Refine NotE;
+> Refine Pa;
+> Refine AllE ? ? a AllNotP;
+> ReturnAll;
+> ExI;
+
+> Claim ExE : (A : Type) (P : A -> Prop) (Q : Prop) ((x : A) P x -> Q) -> Ex A P -> Q;
+> Intros A P Q PQ ExP;
+> Refine cont;
+> Intros NotQ;
+> Refine NotE;
+> 2 Refine ExP;
+> Refine AllI;
+> Intros x;
+> Refine NotI;
+> Intros Px;
+> Refine NotE;
+> Refine PQ;
+> Refine Px;
+> Refine NotQ;
+> ReturnAll;
+> ExE;
+
+> Claim Notall_Exnot : (A : Type) (P : A -> Prop) Not (All A P) -> Ex A [x : A] Not (P x);
+> Intros A P;
+> Refine contrapos;
+> Intros H;
+> Refine AllI;
+> Intros x;
+> Refine cont;
+> Intros nPx;
+> Refine NotE;
+> 2 Refine H;
+> Refine ExI;
+> Refine nPx;
+> ReturnAll;
+> Notall_Exnot;
+
+Natural Numbers
+
+> Inductive [Nat : Type] Constructors [zero : Nat] [succ : (n : Nat) Nat];
+
+Product Types
+
+> Inductive [A : Type][B : Type][Prod : Type] Constructors [pair : (a : El A) (b : El B) Prod];
+
+> [pi1 = [A, B : Type] E_Prod A B ([_ : Prod A B] A) ([a : A][_ : B] a)];
+> [pi2 = [A, B : Type] E_Prod A B ([_ : Prod A B] B) ([_ : A][b : B] b)];
+
+Quadruples
+
+> [Powfour [A, B, C, D : Type] = Prod (Prod A B) (Prod C D)];
+> [quad [A, B, C, D : Type] [a : A] [b : B] [c : C] [d : D] = pair ? ? (pair ? ? a b) (pair ? ? c d) : Powfour A B C D];
+> [fst4 [A, B, C, D : Type] [z : Powfour A B C D] = pi1 ? ? (pi1 ? ? z)];
+> [snd4 [A, B, C, D : Type] [z : Powfour A B C D] = pi2 ? ? (pi1 ? ? z)];
+> [thd4 [A, B, C, D : Type] [z : Powfour A B C D] = pi1 ? ? (pi2 ? ? z)];
+> [fth4 [A, B, C, D : Type] [z : Powfour A B C D] = pi2 ? ? (pi2 ? ? z)];
+
+Function Types
+
+> Inductive [A : Type][B : Type][Arr : Type] Constructors [lambda : (f : (a : El A) El B) Arr];
+
+> [app = [A, B : Type][f : Arr A B][a : A] E_Arr A B ([_ : Arr A B] B) ([F : A -> B] F a) f];
+
+Universe of Small Types
+
+> [U : Type];
+> [T : U -> Type];
+> [nat : U];
+> [prod : U -> U -> U];
+
+The computation rules
+T nat ==> Nat
+T (prod a b) ==> Prod (T a) (T b)
+
+> SimpleElimRule U T 1
+>   [nat 0 = Nat : Type]
+>   [prod 2 = [a : U] [b : U] Prod (T a) (T b)
+>         : (a : U) (b : U) Type];
+
+> [powfour [A,B,C,D : U] = prod (prod A B) (prod C D)];
+
+> [Eq : (A : U) T A -> T A -> Prop];
+> [EqI : (A : U) (a : T A) Eq A a a];
+> [EqE : (A : U) (P : T A -> Prop) (a,b : T A) P a -> Eq A a b -> P b];
+
+> Claim sym : (A : U) (a, b : T A) Eq A a b -> Eq A b a;
+> Intros A a b;
+> Refine EqE A ([x : T A] Eq A x a);
+> Refine EqI;
+> ReturnAll;
+> sym;
+
+> Claim trans : (A : U) (a, b, c : T A) Eq A a b -> Eq A b c -> Eq A a c;
+> Intros A a;
+> Refine EqE A (Eq A a);
+> ReturnAll;
+> trans;
+
+> Claim transl : (A : U) (a, b, c : T A) Eq A a b -> Eq A a c -> Eq A b c;
+> Intros A a b c a_is_b a_is_c;
+> Refine EqE A ([z : T A] Eq A z c) a b;
+> Refine a_is_b;
+> Refine a_is_c;
+> ReturnAll;
+> transl;
+
+> Claim transr : (A : U) (a, b, c : T A) Eq A a c -> Eq A b c -> Eq A a b;
+> Intros A a b c a_is_c b_is_c;
+> Refine trans;
+> Refine sym;
+> Refine b_is_c;
+> Refine a_is_c;
+> ReturnAll;
+> transr;
+
+> Claim wd : (A, B : U) (f : T A -> T B) (a,b:T A)Eq A a b -> Eq B (f a) (f b);
+> Intros A B f a b;
+> Refine EqE A ([x : T A] Eq B (f a) (f x));
+> Refine EqI;
+> ReturnAll;
+> wd;
+
+> Claim wd2 : (A, B, C : U) (f : T A -> T B -> T C) (a,a' : T A) (b,b' : T B)
+>  Eq A a a' -> Eq B b b' -> Eq C (f a b) (f a' b');
+> Intros A B C f a a' b b' a_is_a' b_is_b';
+> Refine trans C (f a b) (f a b') (f a' b');
+> Refine wd A C [x : T A] f x b';
+> Refine a_is_a';
+> Refine wd B C (f a);
+> Refine b_is_b';
+> ReturnAll;
+> wd2;
+
+> Claim EqE' : (A : U) (P : T A -> Prop) (a, b : T A) Eq A a b -> P b -> P a;
+> Intros A P a b a_is_b Pb;
+> Refine EqE A P b a;
+> Refine sym;
+> Refine a_is_b;
+> Refine Pb;
+> ReturnAll;
+> EqE;
+
+> Claim EqE2 : (A, B : U) (P : T A -> T B -> Prop) (a, a' : T A) (b, b' : T B) Eq A a a' -> Eq B b b' -> P a b -> P a' b';
+> Intros A B P a a' b b' a_is_a' b_is_b' Pab;
+> Refine EqE B (P a') b;
+> Refine b_is_b';
+> Refine EqE A ([t : T A] P t b) a;
+> Refine a_is_a';
+> Refine Pab;
+> ReturnAll;
+> EqE2;
+
+> [Neq [A : U] [x, y : T A] = Not (Eq A x y)];
+
+Universe of Small Propositions
+
+> [prop : Type];
+> [V : prop -> Prop];
+> [false : prop];
+> [imp : prop -> prop -> prop];
+> [all : (A : U) (T A -> prop) -> prop];
+> [eq : (A : U) T A -> T A -> prop];
+
+The computation rules
+V false ==> False
+V (imp p q) ==> Imp (V p) (V q)
+V (all A p) ==> All (T A) [x : T A] V (p x)
+V (eq A a b) ==> Eq A a b
+
+> SimpleElimRule prop V 1
+>   [false 0 = False : Prop]
+>   [imp 2 = [p : prop] [q : prop] Imp (V p) (V q)
+>          : (p : prop) (q : prop) Prop]
+>   [all 2 = [A : U] [p : T A -> prop] All (T A) [x : T A] V (p x)
+>          : (A : U) (p : T A -> prop) Prop]
+>   [eq 3 = [A : U] [a : T A] [b : T A] Eq A a b
+>         : (A : U) (a : T A) (b : T A) Prop];
+
+> [not = [p:prop] imp p false];
+> [true = not false];
+> [and = [p,q:prop] not (imp p (not q))];
+> [or = [p,q:prop] imp (not p) q];
+> [iff = [p,q:prop] and (imp p q) (imp q p)];
+> [ex = [A : U][p : T A -> prop] not (all A [x : T A] not (p x))];
+
+> [Ind_Nat : (P : Nat -> prop) V (P zero) -> ((n : Nat) V (P n) -> V (P (succ n))) -> (n : Nat) V (P n)];
+> [Big_Ind_Nat : (P : Nat -> Prop) P zero -> ((n : Nat) P n -> P (succ n)) -> (n : Nat) P n];
+> [Ind_Prod : (A,B : Type) (P : Prod A B -> prop) ((a : A) (b : B) V (P (pair A B a b))) -> (p : Prod A B) V (P p)];
+> [Ind_Arr : (A,B : Type) (P : Arr A B -> prop) ((f : A -> B) V (P (lambda A B f))) -> (f : Arr A B) V (P f)];
+
+Sets
+
+> [Set : Type -> Type];
+> [set : (A : Type) (A -> prop) -> Set A];
+> [in : (A : Type) A -> Set A -> prop];
+
+> SimpleElimRule Set in 3
+>   [set 2 = [A : Type][a : A][A' : Type][P : A -> prop] P a
+>          : (A : Type)(a : A)(A' : Type)(P : A -> prop) prop];
+
+> [In [A : Type][a : A][S : Set A] = V (in A a S)];
+
+> [set2 [A, B : Type] [P : A -> B -> prop] = set (Prod A B) [p : Prod A B] P (pi1 A B p) (pi2 A B p)];
+> [in2 [A, B : Type] [a : A] [b : B] [S : Set (Prod A B)] = in ? (pair A B a b) S];
+> [In2 [A, B : Type] [a : A] [b : B] [S : Set (Prod A B)] = In ? (pair A B a b) S];
+
+> [set4 [A, B, C, D : Type] [P : A -> B -> C -> D -> prop] = set (Powfour A B C D) [p : Powfour A B C D] P (fst4 A B C D p) (snd4 A B C D p) (thd4 A B C D p) (fth4 A B C D p)];
+> [in4 [A, B, C, D : Type] [a : A] [b : B] [c : C] [d : D] [S : Set (Powfour A B C D)] = in ? (quad A B C D a b c d) S];
+> [In4 [A, B, C, D : Type] [a : A] [b : B] [c : C] [d : D] [S : Set (Powfour A B C D)] = In ? (quad A B C D a b c d) S];
+
+> [reflexive = [A : Type] [R : A -> A -> Prop] All A [x : A] R x x];
+> [symmetric = [A : Type] [R : A -> A -> Prop] All A [x : A] All A [y : A]
+>  Imp (R x y) (R y x)];
+> [transitive = [A : Type] [R : A -> A -> Prop]
+>  All A [x : A] All A [y : A] All A [z : A] Imp (And (R x y) (R y z)) (R x z)];

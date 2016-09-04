@@ -1,0 +1,107 @@
+> module nat_times where;
+
+> import nat_plus;
+
+Multiplication
+
+> [times [m : Nat] = E_Nat ([_ : Nat] Nat) zero ([x, y : Nat] plus y m)];
+
+> Claim times_plus_distl : (m, n, p : Nat) Eq nat (times m (plus n p)) (plus (times m n) (times m p));
+> Intros m n;
+> Refine Ind_Nat [p : Nat] eq nat (times m (plus n p)) (plus (times m n) (times m p));
+Base Case
+> 2 Refine EqI;
+Induction Step
+> Intros p ih;
+> Refine trans;
+> Refine plus_assocr (times m n) (times m p) m;
+> Refine wd nat nat [x : Nat] plus x m;
+> Refine ih;
+> ReturnAll;
+> times_plus_distl;
+
+> Claim times_plus_distl' : (m, n, p : Nat) Eq nat (plus (times m n) (times m p)) (times m (plus n p));
+> Intros m n p;
+> Refine sym;
+> Refine times_plus_distl;
+> ReturnAll;
+> times_plus_distl';
+
+> Claim times_assocl : (m, n, p : Nat) Eq nat (times m (times n p)) (times (times m n) p);
+> Intros m n;
+> Refine Ind_Nat [p : Nat] eq nat (times m (times n p)) (times (times m n) p);
+Base Case
+> 2 Refine EqI;
+Induction Step
+> Intros p ih;
+> Refine trans nat ? (plus (times m (times n p)) (times m n));
+> Refine wd nat nat [x : Nat] plus x (times m n);
+> Refine ih;
+> Refine times_plus_distl;
+> ReturnAll;
+> times_assocl;
+
+> Claim times_assocr: (m, n, p : Nat) Eq nat (times (times m n) p) (times m (times n p));
+> Intros m n p;
+> Refine sym;
+> Refine times_assocl;
+> ReturnAll;
+> times_assocr;
+
+> Claim zero_times : (n : Nat) Eq nat (times zero n) zero;
+> Refine Ind_Nat [n : Nat] eq nat (times zero n) zero;
+> 2 Refine EqI;
+> Intros n ih;
+> Refine ih;
+> ReturnAll;
+> zero_times;
+
+> Claim succ_times : (m, n : Nat) Eq nat (times (succ m) n) (plus (times m n) n);
+> Intros m;
+> Refine Ind_Nat [n : Nat] eq nat (times (succ m) n) (plus (times m n) n);
+> 2 Refine EqI;
+> Intros p ih;
+> Refine wd nat nat succ;
+> Refine trans nat ? (plus (plus (times m p) p) m);
+> 2 Refine wd nat nat [x : Nat] plus x m;
+> 2 Refine ih;
+> Refine trans nat ? (plus (times m p) (plus p m));
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus (times m p) (plus m p));
+> 2 Refine wd nat nat (plus (times m p));
+> 2 Refine plus_comm;
+> Refine plus_assocl;
+> ReturnAll;
+> succ_times;
+
+> Claim times_comm : (m, n : Nat) Eq nat (times m n) (times n m);
+> Intros m;
+> Refine Ind_Nat [n : Nat] eq nat (times m n) (times n m);
+> 2 Refine sym;
+> 2 Refine zero_times;
+> Intros n ih;
+> Refine transr nat (plus (times m n) m) (times (succ n) m) (plus (times n m) m);
+> 2 Refine wd nat nat [x : Nat] plus x m;
+> 2 Refine ih;
+> Refine succ_times;
+> ReturnAll;
+> times_comm;
+
+> Claim times_plus_distr : (m, n, p : Nat) Eq nat (times (plus m n) p) (plus (times m p) (times n p));
+> Intros m n p;
+> Refine trans;
+> 2 Refine times_comm;
+> Refine trans;
+> 2 Refine times_plus_distl;
+> Refine wd2 nat nat nat plus;
+> Refine times_comm;
+> Refine times_comm;
+> ReturnAll;
+> times_plus_distr;
+
+> Claim times_plus_distr' : (m, n, p : Nat) Eq nat (plus (times m p) (times n p)) (times (plus m n) p);
+> Intros m n p;
+> Refine sym;
+> Refine times_plus_distr;
+> ReturnAll;
+> times_plus_distr';

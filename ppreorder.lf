@@ -1,0 +1,66 @@
+> module ppreorder where;
+
+> import weyl;
+
+> [ppreorder = [A : Type][le : A -> A -> Prop]
+>  And (transitive A le)
+>  (And (All A [x : A] All A [y : A] Imp (le x y) (le x x))
+>  (All A [x : A] All A [y : A] Imp (le x y) (le y y)))];
+
+> Claim ppreorderI : (A : Type) (le : A -> A -> Prop)
+>  ((x,y,z : A) le x y -> le y z -> le x z) ->
+>  ((x,y : A) le x y -> le x x) ->
+>  ((x,y : A) le x y -> le y y) ->
+>  ppreorder A le;
+> Intros A le trans1 left right;
+> Refine AndI;
+> Refine AndI;
+> Refine AllI;
+> Intros x;
+> Refine AllI;
+> Intros y;
+> Refine ImpI;
+> Refine right;
+> ReturnAll;
+> Refine AllI;
+> Intros x;
+> Refine AllI;
+> Intros y;
+> Refine ImpI;
+> Refine left;
+> ReturnAll;
+> Refine AllI;
+> Intros x;
+> Refine AllI;
+> Intros y;
+> Refine AllI;
+> Intros z;
+> Refine ImpI;
+> Refine AndE;
+> Refine trans1;
+> ReturnAll;
+
+> Claim ppreorder_trans : (A : Type) (le : A -> A -> Prop) (a,b,c : A)
+>  ppreorder A le -> le a b -> le b c -> le a c;
+> Intros A le a b c ord a_is_b b_is_c;
+> Refine ImpE;
+> 3 Refine And;
+> Refine AndI;
+> Refine b_is_c;
+> Refine a_is_b;
+> Refine AllE ? ? ? (AllE ? ? ? (AllE ? ? ? (AndE1 ? ? ord)));
+> ReturnAll;
+
+> Claim ppreorder_left : (A : Type) (le : A -> A -> Prop) (a,b : A)
+>  ppreorder A le -> le a b -> le a a;
+> Intros A eA a b ord;
+> Refine ImpE;
+> Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? ord)));
+> ReturnAll;
+
+> Claim ppreorder_right : (A : Type) (le : A -> A -> Prop) (a,b : A)
+>  ppreorder A le -> le a b -> le b b;
+> Intros A le a b ord;
+> Refine ImpE;
+> Refine AllE ? ? ? (AllE ? ? ? (AndE2 ? ? (AndE2 ? ? ord)));
+> ReturnAll;

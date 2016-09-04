@@ -1,0 +1,30 @@
+> module real_exp where;
+
+> import real_times;
+
+Natural Number Exponentiation
+
+> [exp [R : SInt2] = E_Nat ([_ : Nat] SInt2) one
+>   [_ : Nat] timesR R];
+
+> [expwdl : (x, y : SInt2) (n : Nat) EqR x y -> EqR (exp x n) (exp y n)];
+> [exptotal : (x : SInt2) (n : Nat) Real x -> Real (exp x n)];
+
+R is algebraic of degree at most n
+
+> [alg_bd [x : SInt2] [n : Nat] = in2 ? ? x (Q2R one)
+>   (E_Nat ([_ : Nat] Set (Prod SInt2 SInt2))
+>     (set2 ? ? [y, z : SInt2] and (real y) (eqR z zero))
+>     ([m : Nat][X : Set (Prod SInt2 SInt2)] set2 ? ? [y, z : SInt2] ex int2 [q : Int2]
+>        in2 ? ? y (plusR (timesR y z) (minusR q)) X)
+>     n)];
+> [Alg_Bd [x : SInt2] [n : Nat] = In2 ? ? x (Q2R one)
+>   (E_Nat ([_ : Nat] Set (Prod SInt2 SInt2))
+>     (set2 ? ? [y, z : SInt2] and (real y) (eqR z zero))
+>     ([m : Nat][X : Set (Prod SInt2 SInt2)] set2 ? ? [y, z : SInt2] ex int2 [q : Int2]
+>        in2 ? ? y (plusR (timesR y z) (minusR q)) X)
+>     n)];
+
+> [algebraic [R : SInt2] = ex nat (alg_bd R)];
+> [Algebraic [R : SInt2] = Ex Nat (Alg_Bd R)];
+

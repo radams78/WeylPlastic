@@ -1,0 +1,70 @@
+> module semigroup where;
+
+> Claim four_lemma : (A : Type) (e : A -> A -> Prop) (op : A -> A -> A) (a,b,c,d:A)
+>  ((x,y : A) e x y -> e y x) ->
+>  ((x,y,z : A) e x y -> e y z -> e x z) ->
+>  ((x,x',y,y':A) e x x' -> e y y' -> e (op x y) (op x' y')) ->
+>  ((x,y,z : A) e x x -> e y y -> e z z -> e (op x (op y z)) (op (op x y) z)) ->
+>  ((x,y:A) e x x -> e y y -> e (op x y) (op y x)) ->
+>  e a a -> e b b -> e c c -> e d d ->
+>  e (op (op a b) (op c d)) (op (op a c) (op b d));
+> Intros A e op a b c d sym trans wd assoc comm ain bin cin din;
+> Refine trans ? (op a (op b (op c d)));
+> Refine trans ? (op a (op c (op b d)));
+> Refine assoc;
+> Refine wd;
+> Refine din;
+> Refine bin;
+> Refine cin;
+> Refine ain;
+> Refine wd;
+> Refine trans ? (op (op b c) d);
+> Refine trans ? (op (op c b) d);
+> Refine sym;
+> Refine assoc;
+> Refine din;
+> Refine bin;
+> Refine cin;
+> Refine wd;
+> Refine din;
+> Refine comm;
+> Refine cin;
+> Refine bin;
+> Refine assoc;
+> Refine din;
+> Refine cin;
+> Refine bin;
+> Refine ain;
+> Refine sym;
+> Refine assoc;
+> Refine wd;
+> Refine din;
+> Refine cin;
+> Refine bin;
+> Refine ain;
+> ReturnAll;
+
+> Claim total_four_lemma : (A : Type) (e : A -> A -> Prop) (op : A -> A -> A) (a,b,c,d:A)
+>  ((x : A) e x x) ->
+>  ((x,y : A) e x y -> e y x) ->
+>  ((x,y,z : A) e x y -> e y z -> e x z) ->
+>  ((x,x',y,y':A) e x x' -> e y y' -> e (op x y) (op x' y')) ->
+>  ((x,y,z : A) e (op x (op y z)) (op (op x y) z)) ->
+>  ((x,y:A) e (op x y) (op y x)) ->
+>  e (op (op a b) (op c d)) (op (op a c) (op b d));
+> Intros A e op a b c d ref sym trans wd assoc comm;
+> Refine four_lemma A e op;
+> Refine ref;
+> Refine ref;
+> Refine ref;
+> Refine ref;
+> Intros x y _ _;
+> Refine comm;
+> ReturnAll;
+> Intros x y z _ _ _;
+> Refine assoc;
+> ReturnAll;
+> Refine wd;
+> Refine trans;
+> Refine sym;
+> ReturnAll;

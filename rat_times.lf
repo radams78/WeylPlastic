@@ -1,0 +1,277 @@
+> module rat_times where;
+
+> import rat_plus;
+
+> [timesQ [q, r : PreQ] = (div (timesZ (pi1 ? ? q) (pi1 ? ? r)) (timesZ (pi2 ? ? q) (pi2 ? ? r)))];
+
+> [timesQtotal : (q,r:PreQ) Rational q -> Rational r -> Rational (timesQ q r)];
+ Claim timesQtotal : (q, r : PreQ) Rational q -> Rational r -> Rational (timesQ q r);
+ Intros q r;
+ Refine timesZ_not_zero;
+ ReturnAll;
+ timesQtotal;
+
+> [timesQwd : (q,q',r,r':PreQ) EqQ q q' -> EqQ r r' -> EqQ (timesQ q r) (timesQ q' r')];
+ Claim timesQwd : (q,q',r,r':PreQ) EqQ q q' -> EqQ r r' -> EqQ (timesQ q r) (timesQ q' r');
+ Intros q q' r r' q_is_q' r_is_r';
+ [a = pi1 ? ? q];
+ [b = pi2 ? ? q];
+ [a' = pi1 ? ? q'];
+ [b' = pi2 ? ? q'];
+ [c = pi1 ? ? r];
+ [d = pi2 ? ? r];
+ [c' = pi1 ? ? r'];
+ [d' = pi2 ? ? r'];
+ Refine EqZ_trans (timesZ (timesZ a c) (timesZ b' d')) (timesZ (timesZ a b') (timesZ c d')) (timesZ (timesZ a' c') (timesZ b d));
+ Refine EqZ_trans ? (timesZ (timesZ a' b) (timesZ c' d));
+ Refine timesZ_4lm;
+ Refine timesZwd (timesZ a b') (timesZ a' b) (timesZ c d') (timesZ c' d);
+ Refine r_is_r';
+ Refine q_is_q';
+ Refine timesZ_4lm;
+ ReturnAll;
+
+> [timesQwdl : (q, q', r : PreQ) EqQ q q' -> EqQ (timesQ q r) (timesQ q' r)];
+ Claim timesQwdl : (q,q',r : PreQ) EqQ q q' -> EqQ (timesQ q r) (timesQ q' r);
+ Intros q q' r q_is_q';
+ Refine timesQwd;
+ Refine EqQ_ref;
+ Refine q_is_q';
+ ReturnAll;
+
+> [timesQwdr : (q, r, r' : PreQ) EqQ r r' -> EqQ (timesQ q r) (timesQ q r')];
+ Claim timesQwdr : (q,r,r':PreQ) EqQ r r' -> EqQ (timesQ q r) (timesQ q r');
+ Intros q r r';
+ Refine timesQwd;
+ Refine EqQ_ref;
+ ReturnAll;
+
+> [ZtoQtimes : (x,y:Int) EqQ (timesZ x y) (timesQ x y)];
+ Claim ZtoQtimes : (x, y : Int) EqQ (timesZ x y) (timesQ x y);
+ Intros x y;
+ Refine EqQ_ref;
+ ReturnAll;
+ ZtoQtimes;
+
+> [timesQ_comm : (q,r:PreQ) EqQ (timesQ q r) (timesQ r q)];
+ Claim timesQ_comm : (q, r : PreQ) EqQ (timesQ q r) (timesQ r q);
+ Intros q r;
+ [a = pi1 ? ? q];
+ [b = pi2 ? ? q];
+ [c = pi1 ? ? r];
+ [d = pi2 ? ? r];
+ Refine timesZwd (timesZ a c) (timesZ c a) (timesZ d b) (timesZ b d);
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+ timesQ_comm;
+
+> [timesQ_assocl : (q,r,s:PreQ) EqQ (timesQ q (timesQ r s)) (timesQ (timesQ q r) s)];
+ Claim timesQ_assocl : (q, r, s : PreQ) EqQ (timesQ q (timesQ r s)) (timesQ (timesQ q r) s);
+ Intros q r s;
+ [a = pi1 ? ? q];
+ [b = pi2 ? ? q];
+ [c = pi1 ? ? r];
+ [d = pi2 ? ? r];
+ [e = pi1 ? ? s];
+ [f = pi2 ? ? s];
+ Refine timesZwd (timesZ a (timesZ c e)) (timesZ (timesZ a c) e) (timesZ (timesZ b d) f) (timesZ b (timesZ d f));
+ Refine timesZ_assocr;
+ Refine timesZ_assocl;
+ ReturnAll;
+ timesQ_assocl;
+
+> [timesQ_assocr : (q,r,s:PreQ) EqQ (timesQ (timesQ q r) s) (timesQ q (timesQ r s))];
+ Claim timesQ_assocr : (q, r, s : PreQ) EqQ (timesQ (timesQ q r) s) (timesQ q (timesQ r s));
+ Intros q r s;
+ Refine EqQ_sym;
+ Refine timesQ_assocl;
+ ReturnAll;
+ timesQ_assocr;
+
+> [timesQ_plusQ_distl : (q,r,s:PreQ) EqQ (timesQ q (plusQ r s)) (plusQ (timesQ q r) (timesQ q s))];
+ Claim timesQ_plusQ_distl : (q, r, s : PreQ) EqQ (timesQ q (plusQ r s)) (plusQ (timesQ q r) (timesQ q s));
+ Intros q r s;
+ [a = pi1 ? ? q];
+ [b = pi2 ? ? q];
+ [c = pi1 ? ? r];
+ [d = pi2 ? ? r];
+ [e = pi1 ? ? s];
+ [f = pi2 ? ? s];
+ Refine EqZ_trans (timesZ (timesZ a (plusZ (timesZ c f) (timesZ e d))) (timesZ (timesZ b d) (timesZ b f)))
+                  (timesZ (timesZ a (plusZ (timesZ c f) (timesZ e d))) (timesZ b (timesZ b (timesZ d f))))
+                  (timesZ (plusZ (timesZ (timesZ a c) (timesZ b f)) (timesZ (timesZ a e) (timesZ b d))) (timesZ b (timesZ d f)));
+ 2 Refine timesZwdr (timesZ a (plusZ (timesZ c f) (timesZ e d))) (timesZ (timesZ b d) (timesZ b f)) (timesZ b (timesZ b (timesZ d f)));
+ 2 Refine EqZ_trans ? (timesZ b (timesZ d (timesZ b f)));
+ 3 Refine timesZ_assocr b d (timesZ b f);
+ 2 Refine timesZwdr b (timesZ d (timesZ b f)) (timesZ b (timesZ d f));
+ 2 Refine EqZ_trans ? (timesZ (timesZ d b) f);
+ 3 Refine timesZ_assocl;
+ 2 Refine EqZ_trans ? (timesZ (timesZ b d) f);
+ 3 Refine timesZwdl (timesZ d b) (timesZ b d) f;
+ 3 Refine timesZ_comm;
+ 2 Refine timesZ_assocr;
+ Refine EqZ_trans ? (timesZ (timesZ (timesZ a (plusZ (timesZ c f) (timesZ e d))) b) (timesZ b (timesZ d f)));
+ 2 Refine timesZ_assocl (timesZ a (plusZ (timesZ c f) (timesZ e d))) b (timesZ b (timesZ d f));
+ Refine timesZwdl (timesZ (timesZ a (plusZ (timesZ c f) (timesZ e d))) b) (plusZ (timesZ (timesZ a c) (timesZ b f)) (timesZ (timesZ a e) (timesZ b d))) (timesZ b (timesZ d f));
+ Refine EqZ_trans ? (timesZ (plusZ (timesZ a (timesZ c f)) (timesZ a (timesZ e d))) b);
+ 2 Refine timesZwdl (timesZ a (plusZ (timesZ c f) (timesZ e d))) (plusZ (timesZ a (timesZ c f)) (timesZ a (timesZ e d))) b;
+ 2 Refine timesZ_plusZ_distl a (timesZ c f) (timesZ e d);
+ Refine EqZ_trans ? (plusZ (timesZ (timesZ a (timesZ c f)) b) (timesZ (timesZ a (timesZ e d)) b));
+ 2 Refine timesZ_plusZ_distr (timesZ a (timesZ c f)) (timesZ a (timesZ e d)) b;
+ Refine plusZwd (timesZ (timesZ a (timesZ c f)) b) (timesZ (timesZ a c) (timesZ b f)) (timesZ (timesZ a (timesZ e d)) b) (timesZ (timesZ a e) (timesZ b d));
+ 2 Refine EqZ_trans ? (timesZ (timesZ (timesZ a c) f) b);
+ 3 Refine timesZwdl (timesZ a (timesZ c f)) (timesZ (timesZ a c) f) b;
+ 3 Refine timesZ_assocl;
+ 2 Refine EqZ_trans ? (timesZ (timesZ a c) (timesZ f b));
+ 3 Refine timesZ_assocr (timesZ a c);
+ 2 Refine timesZwdr (timesZ a c) (timesZ f b) (timesZ b f);
+ 2 Refine timesZ_comm;
+ Refine EqZ_trans ? (timesZ (timesZ (timesZ a e) d) b);
+ 2 Refine timesZwdl (timesZ a (timesZ e d)) (timesZ (timesZ a e) d);
+ 2 Refine timesZ_assocl;
+ Refine EqZ_trans ? (timesZ (timesZ a e) (timesZ d b));
+ 2 Refine timesZ_assocr (timesZ a e);
+ Refine timesZwdr (timesZ a e) (timesZ d b) (timesZ b d);
+ Refine timesZ_comm;
+ ReturnAll;
+ timesQ_plusQ_distl;
+
+ [timesQ_plusQ_distr : (q,r,s : PreQ) EqQ (timesQ (plusQ q r) s) (plusQ (timesQ q s) (timesQ r s));
+> Claim timesQ_plusQ_distr : (q, r, s : PreQ) EqQ (timesQ (plusQ q r) s) (plusQ (timesQ q s) (timesQ r s));
+> Intros q r s;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> [e = pi1 ? ? s];
+> [f = pi2 ? ? s];
+> Refine EqZ_trans (timesZ (timesZ (plusZ (timesZ a d) (timesZ c b)) e)
+> (timesZ (timesZ b f) (timesZ d f)))
+> (timesZ (plusZ (timesZ (timesZ a e) d) (timesZ (timesZ c e) b))
+> (timesZ f (timesZ (timesZ b d) f)))
+> (timesZ (plusZ (timesZ (timesZ a e) (timesZ d f)) (timesZ (timesZ c e) (timesZ b f)))
+> (timesZ (timesZ b d) f));
+> Refine EqZ_trans ? (timesZ (timesZ (plusZ (timesZ (timesZ a e) d) (timesZ (timesZ c e) b)) f)
+> (timesZ (timesZ b d) f));
+> Refine timesZwdl (timesZ (plusZ (timesZ (timesZ a e) d) (timesZ (timesZ c e) b)) f)
+> (plusZ (timesZ (timesZ a e) (timesZ d f)) (timesZ (timesZ c e) (timesZ b f)))
+>(timesZ (timesZ b d) f);
+> Refine EqZ_trans ? (plusZ (timesZ (timesZ (timesZ a e) d) f) (timesZ (timesZ (timesZ c e) b) f));
+> Refine plusZwd (timesZ (timesZ (timesZ a e) d) f) 
+> (timesZ (timesZ a e) (timesZ d f)) (timesZ (timesZ (timesZ c e) b) f) (timesZ (timesZ c e) (timesZ b f));
+> Refine timesZ_assocr (timesZ c e);
+> Refine timesZ_assocr (timesZ a e);
+> Refine timesZ_plusZ_distr (timesZ (timesZ a e) d) (timesZ (timesZ c e) b);
+> Refine timesZ_assocl (plusZ (timesZ (timesZ a e) d) (timesZ (timesZ c e) b)) f (timesZ (timesZ b d) f);
+> Refine timesZwd (timesZ (plusZ (timesZ a d) (timesZ c b)) e) (plusZ (timesZ (timesZ a e) d) (timesZ (timesZ c e) b))
+> (timesZ (timesZ b f) (timesZ d f)) (timesZ f (timesZ (timesZ b d) f));
+> Refine EqZ_trans ? (timesZ (timesZ (timesZ b f) d) f);
+> Refine EqZ_trans ? (timesZ f (timesZ (timesZ b f) d));
+> Refine timesZwdr f (timesZ (timesZ b f) d) (timesZ (timesZ b d) f);
+> Refine EqZ_trans;
+> Refine timesZ_assocl b d f;
+> Refine EqZ_trans;
+> Refine timesZwdr b (timesZ f d) (timesZ d f);
+> Refine timesZ_comm;
+> Refine timesZ_assocr;
+> Refine timesZ_comm (timesZ (timesZ b f) d);
+> Refine timesZ_assocl (t
+
+> Refine EqQ_trans ? (timesQ s (plusQ q r));
+> 3 Refine timesQtotal s (plusQ q r);
+> 4 Refine rats;
+> 3 Refine plusQtotal;
+> 4 Refine ratq;
+> 3 Refine ratr;
+> 2 Refine timesQ_comm (plusQ q r);
+> Refine EqQ_trans ? (plusQ (timesQ s q) (timesQ s r));
+> 3 Refine plusQtotal (timesQ s q) (timesQ s r);
+> 4 Refine timesQtotal;
+> 5 Refine rats;
+> 4 Refine ratq;
+> 3 Refine timesQtotal;
+> 4 Refine rats;
+> 3 Refine ratr;
+> 2 Refine timesQ_plusQ_distl;
+> Refine plusQwd (timesQ s q) (timesQ q s) (timesQ s r) (timesQ r s);
+> 2 Refine timesQ_comm;
+> Refine timesQ_comm;
+> ReturnAll;
+> timesQ_plusQ_distr;
+
+> Claim timesQ_one : (q : PreQ) EqQ (timesQ q one) q;
+> Intros q;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> Refine timesZwd (timesZ a one) a b (timesZ b one);
+> Refine EqZ_sym;
+> Refine timesZ_one;
+> Refine timesZ_one;
+> ReturnAll;
+> timesQ_one;
+
+> Claim zero_timesQ : (q : PreQ) EqQ (timesQ zero q) zero;
+> Intros q;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> Refine EqZ_trans (timesZ (timesZ zero a) one) (timesZ zero a) (timesZ zero (timesZ one b));
+> 2 Refine timesZ_one;
+> Refine EqZ_trans ? zero;
+> 2 Refine zero_timesZ;
+> Refine EqZ_sym;
+> Refine zero_timesZ (timesZ one b);
+> ReturnAll;
+> zero_timesQ;
+
+> [invQ [q : PreQ] = div (pi2 ? ? q) (pi1 ? ? q)];
+
+> Claim invQwd : (q, q' : PreQ) EqQ q q' -> EqQ (invQ q) (invQ q');
+> Intros q q' q_is_q';
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> Refine EqZ_trans (timesZ b a') (timesZ a' b) (timesZ b' a);
+> 2 Refine timesZ_comm;
+> Refine EqZ_trans ? (timesZ a b');
+> 2 Refine EqZ_sym;
+> 2 Refine q_is_q';
+> Refine timesZ_comm;
+> ReturnAll;
+> invQwd;
+
+> Claim invQtotal : (q : PreQ) Not (EqQ q zero) -> Rational (invQ q);
+> Intros q q_not_zero;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> Refine NotI (EqZ a zero);
+> Intros a_is_zero;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> Refine NotE (EqZ (timesZ a one) (timesZ zero b));
+> 2 Refine q_not_zero;
+> Refine EqZ_trans ? a;
+> 2 Refine timesZ_one;
+> Refine EqZ_trans ? zero;
+> 2 Refine a_is_zero;
+> Refine EqZ_sym;
+> Refine zero_timesZ;
+> ReturnAll;
+> invQtotal;
+
+> Claim timesQ_invQ : (q : PreQ) EqQ (timesQ q (invQ q)) one;
+> Intros q;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> Refine EqZ_trans (timesZ (timesZ a b) one) (timesZ a b) (timesZ one (timesZ b a));
+> 2 Refine timesZ_one;
+> Refine EqZ_trans ? (timesZ b a);
+> 2 Refine timesZ_comm;
+> Refine EqZ_sym;
+> Refine one_timesZ (timesZ b a);
+> ReturnAll;
+> timesQ_invQ;
+
+> [halfplushalf : (q : PreQ) Rational q -> EqQ (plusQ (timesQ q (invQ two)) (timesQ q (invQ two))) q];
+> [two_halves : (q : PreQ) Rational q -> EqQ (timesQ (plusQ q q) (invQ two)) q];

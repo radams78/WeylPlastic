@@ -1,0 +1,125 @@
+> module order where;
+
+> import porder;
+> import setoid;
+
+Partial Orders
+
+> [order = [A : Type][eA : A -> A -> Prop][le : A -> A -> Prop]
+>  And (setoid A eA)
+>  (And (reflexive A le)
+>  (And (All A [x : A] All A [y : A] Imp (And (le x y) (le y x)) (eA x y))
+>  (transitive A le)))];
+
+> [orderI : (A : Type) (eA,le : A -> A -> Prop)
+>  setoid A eA ->
+>  ((x : A) le x x) ->
+>  ((x,y : A) le x y -> le y x -> eA x y) ->
+>  ((x,y,z : A) le x y -> le y z -> le x z) ->
+>  order A eA le];
+ Claim orderI : (A : Type) (eA,le : A -> A -> Prop)
+  setoid A eA ->
+  ((x : A) le x x) ->
+  ((x,y : A) le x y -> le y x -> eA x y) ->
+  ((x,y,z : A) le x y -> le y z -> le x z) ->
+  order A eA le;
+ Intros A eA le set r as t;
+ Refine AndI;
+ Refine AndI;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine ImpI;
+ Refine AndE;
+ Refine t;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine AndE;
+ Refine as;
+ ReturnAll;
+ Refine AllI;
+ Refine r;
+ Refine set1;
+ ReturnAll;
+
+> [order_setoid : (A : Type) (eA, le : A -> A -> Prop)
+>  order A eA le -> setoid A eA];
+ Claim order_setoid : (A : Type) (eA, le : A -> A -> Prop)
+  order A eA le -> setoid A eA;
+ Intros A eA le;
+ Refine AndE1;
+ ReturnAll;
+
+> [order_ref : (A : Type) (eA, le : A -> A -> Prop) (a : A)
+>  order A eA le -> le a a];
+ Claim order_ref : (A : Type) (eA, le : A -> A -> Prop) (a : A)
+  order A eA le -> le a a;
+ Intros A eA le a ord;
+ Refine AllE ? ? ? (AndE1 ? ? (AndE2 ? ? ord));
+ ReturnAll;
+
+> [order_antisym : (A : Type) (eA, le : A -> A -> Prop) (a,b : A)
+>  order A eA le -> le a b -> le b a -> eA a b];
+ Claim order_antisym : (A : Type) (eA, le : A -> A -> Prop) (a,b : A)
+  order A eA le -> le a b -> le b a -> eA a b;
+ Intros A eA le a b ord a_le_b b_le_a;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? (AndE2 ? ? ord))));
+ Refine AndI;
+ Refine b_le_a;
+ Refine a_le_b;
+ ReturnAll;
+
+> [order_trans : (A : Type) (eA, le : A -> A -> Prop) (a,b,c : A)
+>  order A eA le -> le a b -> le b c -> le a c];
+ Claim order_trans : (A : Type) (eA, le : A -> A -> Prop) (a,b,c : A)
+  order A eA le -> le a b -> le b c -> le a c;
+ Intros A eA le a b c ord a_le_b b_le_c;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? b (AllE ? ? ? (AndE2 ? ? (AndE2 ? ? (AndE2 ? ? ord)))));
+ Refine AndI;
+ Refine b_le_c;
+ Refine a_le_b;
+ ReturnAll;
+
+> [order_porder : (A : Type) (eA, le : A -> A -> Prop)
+>  order A eA le -> porder A eA le];
+ Claim order_porder : (A : Type) (eA, le : A -> A -> Prop)
+  order A eA le -> porder A eA le;
+ Intros A eA le ord;
+ Refine porderI;
+ Intros x y z;
+ Refine order_trans A eA le;
+ Refine ord;
+ ReturnAll;
+ Intros x y x_le_y;
+ Refine setoid_ref A eA;
+ Refine order_setoid;
+ Refine ord;
+ ReturnAll;
+ Intros x y;
+ Intros x_le_y;
+ Refine setoid_ref A eA;
+ Refine order_setoid;
+ Refine ord;
+ ReturnAll;
+ Intros x y;
+ Refine order_antisym A eA le;
+ Refine ord;
+ ReturnAll;
+ Intros x _;
+ Refine order_ref A eA le;
+ Refine ord;
+ ReturnAll;
+ Refine setoid_psetoid;
+ Refine order_setoid;
+ Refine ord;
+ ReturnAll;

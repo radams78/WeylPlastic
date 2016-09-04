@@ -1,0 +1,48 @@
+> module plorder where;
+
+> import porder;
+
+> [plorder = [A : Type][eA,le : A -> A -> Prop]
+>  And (porder A eA le)
+>  (All A [x : A] All A [y : A] Imp (And (eA x x) (eA y y)) (Or (le x y) (le y x)))];
+
+> [plorderI : (A : Type) (eA,le : A -> A -> Prop)
+>  porder A eA le ->
+>  ((x,y:A) eA x x -> eA y y -> Or (le x y) (le y x)) ->
+>  plorder A eA le];
+ Claim plorderI : (A : Type) (eA,le : A -> A -> Prop)
+  porder A eA le ->
+  ((x,y:A) eA x x -> eA y y -> Or (le x y) (le y x)) ->
+  plorder A eA le;
+ Intros A eA le ord t;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine AndE;
+ Refine t;
+ ReturnAll;
+ Refine ord;
+ ReturnAll;
+
+> [plorder_porder : (A : Type) (eA,le : A -> A -> Prop)
+>  plorder A eA le -> porder A eA le];
+ Claim plorder_porder : (A : Type) (eA,le : A -> A -> Prop)
+  plorder A eA le -> porder A eA le;
+ Intros A eA le;
+ Refine AndE1;
+ ReturnAll;
+
+> [plorder_total : (A : Type) (eA, le : A -> A -> Prop) (a,b : A)
+>  plorder A eA le -> eA a a -> eA b b -> Or (le a b) (le b a)];
+ Claim plorder_total : (A : Type) (eA, le : A -> A -> Prop) (a,b : A)
+  plorder A eA le -> eA a a -> eA b b -> Or (le a b) (le b a);
+ Intros A eA le a b ord a_is_a b_is_b;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? ? (AndE2 ? ? ord));
+ Refine AndI;
+ Refine b_is_b;
+ Refine a_is_a;
+ ReturnAll;

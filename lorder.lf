@@ -1,0 +1,58 @@
+> module lorder where;
+
+> import plorder;
+> import order;
+
+> [lorder [A : Type][eA,le : A -> A -> Prop] =
+>  And (order A eA le)
+>  (All A [x : A] All A [y : A] Or (le x y) (le y x))];
+
+> [lorderI : (A : Type) (eA,le : A -> A -> Prop)
+>  order A eA le ->
+>  ((x,y : A) Or (le x y) (le y x)) ->
+>  lorder A eA le];
+ Claim lorderI : (A : Type) (eA,le : A -> A -> Prop)
+  order A eA le ->
+  ((x,y : A) Or (le x y) (le y x)) ->
+  lorder A eA le;
+ Intros A eA le ord t;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine t;
+ ReturnAll;
+ Refine ord;
+ ReturnAll;
+
+> [lorder_order : (A : Type) (eA,le: A -> A -> Prop)
+>  lorder A eA le -> order A eA le];
+ Claim lorder_order : (A : Type) (eA,le: A -> A -> Prop)
+  lorder A eA le -> order A eA le;
+ Intros A eA le;
+ Refine AndE1;
+ ReturnAll;
+
+> [lorder_antisym : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+>  lorder A eA le -> Or (le a b) (le b a)];
+ Claim lorder_antisym : (A : Type) (eA,le : A -> A -> Prop) (a,b : A)
+  lorder A eA le -> Or (le a b) (le b a);
+ Intros A eA le a b ord;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE2 ? ? ord));
+ ReturnAll;
+
+> [lorder_plorder : (A : Type) (eA, le : A -> A -> Prop)
+>  lorder A eA le -> plorder A eA le];
+ Claim lorder_plorder : (A : Type) (eA, le : A -> A -> Prop)
+  lorder A eA le -> plorder A eA le;
+ Intros A eA le ord;
+ Refine plorderI;
+ Intros x y _ _;
+ Refine lorder_antisym A eA le;
+ Refine ord;
+ ReturnAll;
+ Refine order_porder;
+ Refine lorder_order;
+ Refine ord;
+ ReturnAll;

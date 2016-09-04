@@ -1,0 +1,86 @@
+> module real_times where;
+
+> import real_plus;
+> import real_ord;
+
+Open Remainders
+
+> [open_remainder [M : SInt2] = and (domrat M) (
+>   and (all int2 [q : Int2] all int2 [r : Int2]
+>        imp (in ? q M) (
+>        imp (ltQ q r) (
+>        in ? r M)))
+>   (all int2 [q : Int2] imp (in ? q M) (
+>        ex int2 [r : Int2] and (ltQ q r) (in ? r M))))];
+> [Open_Remainder [M : SInt2] = And (DomRat M) (
+>    And (All Int2 [q : Int2] All Int2 [r : Int2]
+>        Imp (In ? q M) (
+>        Imp (LtQ q r) (
+>        In ? r M)))
+>    (All Int2 [q : Int2] Imp (In ? q M) (
+>        Ex Int2 [r : Int2] And (LtQ q r) (In ? r M))))];
+
+> [upper_comp [M : SInt2] = set Int2 [q : Int2]
+>    ex int2 [r : Int2] and (ltQ r q) (in ? r M) : SInt2];
+> [lower_comp [M : SInt2] = set Int2 [q : Int2]
+>    ex int2 [r : Int2] and (ltQ q r) (in ? r M) : SInt2];
+
+> [OpenCut_OpenRem : (M : SInt2) Open_Cut M -> Open_Remainder (upper_comp M)];
+> [OpenRem_OpenCut : (M : SInt2) Open_Remainder M -> Open_Cut (lower_comp M)];
+> [lowercomp_uppercomp : (M : SInt2) Open_Cut M -> EqDomRat (lower_comp (upper_comp M)) M];
+> [uppercomp_lowercomp : (M : SInt2) Open_Remainder M -> EqDomRat (upper_comp (lower_comp M)) M];
+
+Multiplication of Reals
+
+Multiplying a positive rational by a real
+
+> [QpostimesR [q : Int2] [x : SInt2] = set Int2 [r : Int2] and (rational r) (
+>   ex int2 [s : Int2] and (rational s) (
+>   and (in ? s x)
+>       (eqQ r (timesQ q s))))];
+
+> [QpostimesRwdl : (q, q' : Int2) (x : SInt2) EqQ q q' -> EqR (QpostimesR q x) (QpostimesR q' x)];
+> [QpostimesRwdr : (q : Int2) (x, y : SInt2) EqR x y -> EqR (QpostimesR q x) (QpostimesR q y)];
+> [QpostimesRwd : (q, q' : Int2) (x, y : SInt2) EqQ q q' -> EqR x y -> EqR (QpostimesR q x) (QpostimesR q' y)];
+
+> [QpostimesRtotal : (q : Int2) (x : SInt2) LtQ zero q -> Real x -> Real (QpostimesR q x)];
+
+> [Q2Rpostimes : (q, r : Int2) LtQ zero q -> Rational r -> EqR (timesQ q r) (QpostimesR q r)];
+
+Multiplying a rational by a real
+
+> [QtimesR [q : Int2] [x : SInt2] = set Int2 [r : Int2]
+>    or (and (eqQ q zero) (in ? r zero))
+>   (or (and (ltQ zero q) (in ? r (QpostimesR q r)))
+>       (and (ltQ q zero) (in ? r (minusR (QpostimesR (minusQ q) r)))))];
+
+> [QtimesRwdl : (q, q' : Int2) (x : SInt2) EqQ q q' -> EqR (QtimesR q x) (QtimesR q' x)];
+> [QtimesRwdr : (q : Int2) (x, y : SInt2) EqR x y -> EqR (QtimesR q x) (QtimesR q y)];
+> [QtimesRwd : (q, r : Int2) (x, y : SInt2) EqQ q r -> EqR x y -> EqR (QtimesR q x) (QtimesR r y)];
+
+> [QtimesRtotal : (q : Int2) (x : SInt2) Rational q -> Real x -> Real (QtimesR q x)];
+
+> [Q2RtimesR : (q, r : Int2) Rational q -> Rational r -> EqR (timesQ q r) (QtimesR q r)];
+
+> [timesR [x, y : SInt2] = set Int2 [q : Int2]
+>    or (and (eqR x zero) (in ? q zero))
+>   (or (and (ltR zero x) (ex int2 [r : Int2] and (rational r) (and (in ? r x) (in ? q (QtimesR r y)))))
+>       (and (ltR x zero) (ex int2 [r : Int2] and (rational r) (and (in ? r (upper_comp x)) (in ? q (QtimesR r y))))))];
+
+> [timesRwdl : (x, x', y : SInt2) EqR x x' -> EqR (timesR x y) (timesR x' y)];
+> [timesRwdr : (x, y, y' : SInt2) EqR y y' -> EqR (timesR x y) (timesR x y')];
+> [timesRwd : (x, x', y, y' : SInt2) EqR x x' -> EqR y y' -> EqR (timesR x y) (timesR x' y')];
+
+> [timesRtotal : (x, y : SInt2) Real x -> Real y -> Real (timesR x y)];
+
+> [Q2Rtimes : (q, r : Int2) Rational q -> Rational r -> EqR (timesQ q r) (timesR q r)];
+
+> [invR [x : SInt2] = set Int2 [q : Int2] and (rational q) (
+>   or (and (ltR zero x) (ltR (QtimesR q x) one))
+>      (and (ltR x zero) (ltR one (QtimesR q x))))];
+
+> [invRwd : (x, y : SInt2) EqR x y -> EqR (invR x) (invR y)];
+> [invRtotal : (x : SInt2) Real x -> Not (EqR x zero) -> Real (invR x)];
+> [Q2Rinv : (q : Int2) Rational q -> Not (EqQ q zero) -> EqR (invQ q) (invR q)];
+
+> [timesR_invR : (x : SInt2) Real x -> Not (EqR x zero) -> EqR (timesR x (invR x)) one];

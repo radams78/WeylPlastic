@@ -1,0 +1,716 @@
+> module rat_ord where;
+
+> import rat_times;
+> import int_ord;
+
+> [leQ [q, r : PreQ] = or (and (posZ (pi2 ? ? q)) (and (posZ (pi2 ? ? r))
+>                              (leZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))
+>                      (or (and (posZ (pi2 ? ? q)) (and (negZ (pi2 ? ? r))
+>                              (leZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                      (or (and (negZ (pi2 ? ? q)) (and (posZ (pi2 ? ? r))
+>                              (leZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                          (and (negZ (pi2 ? ? q)) (and (negZ (pi2 ? ? r))
+>                              (leZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))))];
+
+> [LeQ [q, r : PreQ] = Or (And (PosZ (pi2 ? ? q)) (And (PosZ (pi2 ? ? r))
+>                              (LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))
+>                      (Or (And (PosZ (pi2 ? ? q)) (And (NegZ (pi2 ? ? r))
+>                              (LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                      (Or (And (NegZ (pi2 ? ? q)) (And (PosZ (pi2 ? ? r))
+>                              (LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                          (And (NegZ (pi2 ? ? q)) (And (NegZ (pi2 ? ? r))
+>                              (LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))))];
+
+> [LeQI1 : (q, r : PreQ) PosZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)) -> LeQ q r];
+> [LeQI2 : (q, r : PreQ) PosZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)) -> LeQ q r];
+> [LeQI3 : (q, r : PreQ) NegZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)) -> LeQ q r];
+> [LeQI4 : (q, r : PreQ) NegZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)) -> LeQ q r];
+
+> [LeQE1 : (q, r : PreQ) PosZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LeQ q r -> LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q))];
+> [LeQE2 : (q, r : PreQ) PosZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LeQ q r -> LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r))];
+> [LeQE3 : (q, r : PreQ) NegZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LeQ q r -> LeZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r))];
+> [LeQE4 : (q, r : PreQ) NegZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LeQ q r -> LeZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q))];
+
+> [LeQwd : (q, q', r, r' : PreQ) EqQ q q' -> EqQ r r' -> LeQ q r -> LeQ q' r'];
+
+> [LeQ_ref : (q : PreQ) Rational q -> LeQ q q];
+> [LeQ_trans : (q, r, s : PreQ) LeQ q r -> LeQ r s -> LeQ q s];
+> [LeQ_antisym : (q, r : PreQ) LeQ q r -> LeQ r q -> EqQ q r];
+
+> [ltQ [q, r : PreQ] = or (and (posZ (pi2 ? ? q)) (and (posZ (pi2 ? ? r))
+>                              (ltZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))
+>                      (or (and (posZ (pi2 ? ? q)) (and (negZ (pi2 ? ? r))
+>                              (ltZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                      (or (and (negZ (pi2 ? ? q)) (and (posZ (pi2 ? ? r))
+>                              (ltZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                          (and (negZ (pi2 ? ? q)) (and (negZ (pi2 ? ? r))
+>                              (ltZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))))];
+
+> [LtQ [q, r : PreQ] = Or (And (PosZ (pi2 ? ? q)) (And (PosZ (pi2 ? ? r))
+>                              (LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))
+>                      (Or (And (PosZ (pi2 ? ? q)) (And (NegZ (pi2 ? ? r))
+>                              (LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                      (Or (And (NegZ (pi2 ? ? q)) (And (PosZ (pi2 ? ? r))
+>                              (LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)))))
+>                          (And (NegZ (pi2 ? ? q)) (And (NegZ (pi2 ? ? r))
+>                              (LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)))))))];
+
+> Claim LtQI1 : (q, r : PreQ) PosZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)) -> LtQ q r;
+> Intros q r qposZ rposZ ltz;
+> Refine OrI1;
+> Refine AndI;
+> 2 Refine qposZ;
+> Refine AndI;
+> 2 Refine rposZ;
+> Refine ltz;
+> ReturnAll;
+> LtQI1;
+
+> Claim LtQI2 : (q, r : PreQ) PosZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)) ->
+>   LtQ q r;
+> Intros q r qposZ rnegZ H;
+> Refine OrI2;
+> Refine OrI1;
+> Refine AndI;
+> 2 Refine qposZ;
+> Refine AndI;
+> 2 Refine rnegZ;
+> Refine H;
+> ReturnAll;
+> LtQI2;
+
+> Claim LtQI3 : (q, r : PreQ) NegZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r)) ->
+>   LtQ q r;
+> Intros q r qnegZ rposZ H;
+> Refine OrI2;
+> Refine OrI2;
+> Refine OrI1;
+> Refine AndI;
+> 2 Refine qnegZ;
+> Refine AndI;
+> 2 Refine rposZ;
+> Refine H;
+> ReturnAll;
+> LtQI3;
+
+> Claim LtQI4 : (q, r : PreQ) NegZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q)) ->
+>   LtQ q r;
+> Intros q r qnegZ rnegZ H;
+> Refine OrI2;
+> Refine OrI2;
+> Refine OrI2;
+> Refine AndI;
+> 2 Refine qnegZ;
+> Refine AndI;
+> 2 Refine rnegZ;
+> Refine H;
+> ReturnAll;
+> LtQI4;
+
+> Claim LtQE1 : (q, r : PreQ) PosZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LtQ q r ->
+>   LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q));
+> Intros q r qposZ rposZ;
+> Refine OrE;
+> 2 Intros H;
+> Refine AndE2;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 Int Int r);
+> Refine AndE1;
+> Refine AndE2;
+> Refine H;
+> Refine rposZ;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine AndE1;
+> Refine H;
+> Refine qposZ;
+> ReturnAll;
+> Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine AndE1;
+> Refine H;
+> Refine qposZ;
+> ReturnAll;
+> LtQE1;
+
+> Claim LtQE2 : (q, r : PreQ) PosZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LtQ q r ->
+>   LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r));
+> Intros q r qposZ rnegZ;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? r);
+> Refine rnegZ;
+> Refine AndE1;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine AndE2;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine AndE1;
+> Refine H;
+> Refine qposZ;
+> ReturnAll;
+> Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine AndE1;
+> Refine H;
+> Refine qposZ;
+> ReturnAll;
+> LtQE2;
+
+> Claim LtQE3 : (q, r : PreQ) NegZ (pi2 ? ? q) -> PosZ (pi2 ? ? r) -> LtQ q r ->
+>   LtZ (timesZ (pi1 ? ? r) (pi2 ? ? q)) (timesZ (pi1 ? ? q) (pi2 ? ? r));
+> Intros q r qnegZ rposZ;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine qnegZ;
+> Refine AndE1;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine qnegZ;
+> Refine AndE1;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine AndE2;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? r);
+> Refine AndE1;
+> Refine AndE2;
+> Refine H;
+> Refine rposZ;
+> ReturnAll;
+> LtQE3;
+
+> Claim LtQE4 : (q, r : PreQ) NegZ (pi2 ? ? q) -> NegZ (pi2 ? ? r) -> LtQ q r ->
+>   LtZ (timesZ (pi1 ? ? q) (pi2 ? ? r)) (timesZ (pi1 ? ? r) (pi2 ? ? q));
+> Intros q r qnegZ rnegZ;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine qnegZ;
+> Refine AndE1;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? q);
+> Refine qnegZ;
+> Refine AndE1;
+> Refine H;
+> ReturnAll;
+> Refine OrE;
+> 2 Intros H;
+> Refine Not_PosZ_NegZ (pi2 ? ? r);
+> Refine rnegZ;
+> Refine AndE1;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> Intros H;
+> Refine AndE2;
+> Refine AndE2;
+> Refine H;
+> ReturnAll;
+> LtQE4;
+
+> Claim LtQratl : (q, r : PreQ) LtQ q r -> Rational q;
+> Intros q r;
+> Refine OrE;
+> 2 Refine AndE;
+> 2 Intros qposZ _;
+> Refine PosZ_not_zero;
+> Refine qposZ;
+> ReturnAll;
+> Refine OrE;
+> 2 Refine AndE;
+> 2 Intros qposZ _;
+> Refine PosZ_not_zero;
+> Refine qposZ;
+> ReturnAll;
+> Refine OrE;
+> Refine AndE;
+> Intros qnegZ _;
+> Refine NegZ_not_zero;
+> Refine qnegZ;
+> ReturnAll;
+> Refine AndE;
+> Intros qnegZ _;
+> Refine NegZ_not_zero;
+> Refine qnegZ;
+> ReturnAll;
+> LtQratl;
+
+> Claim LtQratr : (q, r : PreQ) LtQ q r -> Rational r;
+> Intros q r;
+> Refine OrE;
+> 2 Refine AndE;
+> 2 Intros _;
+> Refine AndE;
+> Intros rposZ _;
+> Refine PosZ_not_zero;
+> Refine rposZ;
+> ReturnAll;
+> Refine OrE;
+> 2 Refine AndE;
+> 2 Intros _;
+> Refine AndE;
+> Intros rnegZ _;
+> Refine NegZ_not_zero;
+> Refine rnegZ;
+> ReturnAll;
+> Refine OrE;
+> Refine AndE;
+> Intros _;
+> Refine AndE;
+> Intros negZr _;
+> Refine NegZ_not_zero;
+> Refine negZr;
+> ReturnAll;
+> Refine AndE;
+> Intros _;
+> Refine AndE;
+> Intros rposZ _;
+> Refine PosZ_not_zero;
+> Refine rposZ;
+> ReturnAll;
+> LtQratr;
+
+> Claim LtQwdl : (q, q', r : PreQ) Rational q' -> EqQ q q' -> LtQ q r -> LtQ q' r;
+> Intros q q' r ratq' q_is_q' q_lt_r;
+> Refine PosZ_or_NegZ (pi2 ? ? q);
+> 3 Refine LtQratl q r;
+> 3 Refine q_lt_r;
+Case 1: b is posZitive
+> 2 Intros posZb;
+> Refine PosZ_or_NegZ (pi2 ? ? q');
+> 3 Refine ratq';
+Case 1-1: b and b' are posZitive
+> 2 Intros posZb';
+> Refine PosZ_or_NegZ (pi2 ? ? r);
+> 3 Refine LtQratr q r;
+> 3 Refine q_lt_r;
+Case 1-1-1: b, b' and d are posZitive
+> 2 Intros posZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI1;
+> 3 Refine posZb';
+> 2 Refine posZd;
+> Refine LtZ_timesZ_cancell b (timesZ a' d) (timesZ c b');
+> Refine posZb;
+> Refine LtZwd (timesZ b' (timesZ a d)) (timesZ b (timesZ a' d)) (timesZ b' (timesZ c b)) (timesZ b (timesZ c b'));
+> Refine LtZ_timesZl b' (timesZ a d) (timesZ c b);
+> Refine posZb';
+> Refine LtQE1 q r;
+> Refine q_lt_r;
+> Refine posZd;
+> Refine posZb;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 1-1-2: b and b' posZitive, d negZative
+> Intros negZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI2;
+> 3 Refine posZb';
+> 2 Refine negZd;
+> Refine LtZ_timesZ_cancell b (timesZ c b') (timesZ a' d);
+> Refine posZb;
+> Refine LtZwd (timesZ b' (timesZ c b)) (timesZ b (timesZ c b')) (timesZ b' (timesZ a d)) (timesZ b (timesZ a' d));
+> Refine LtZ_timesZl b' (timesZ c b) (timesZ a d);
+> Refine posZb';
+> Refine LtQE2 q r;
+> Refine q_lt_r;
+> Refine negZd;
+> Refine posZb;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 1-2: b posZitive, b' negZative
+> Intros negZb';
+> Refine PosZ_or_NegZ (pi2 ? ? r);
+> 3 Refine LtQratr q r;
+> 3 Refine q_lt_r;
+Case 1-2-1: b posZitive, b' negZative, d posZitive
+> 2 Intros posZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI3;
+> 3 Refine negZb';
+> 2 Refine posZd;
+> Refine LtZ_timesZ_cancell b (timesZ c b') (timesZ a' d);
+> Refine posZb;
+> Refine LtZwd (timesZ b' (timesZ c b)) ? (timesZ b' (timesZ a d));
+> Refine LtZ_timesZl' b' (timesZ a d) (timesZ c b);
+> Refine negZb';
+> Refine LtQE1;
+> Refine q_lt_r;
+> Refine posZd;
+> Refine posZb;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 1-2-2: b posZitive, b' and d negZative
+> Intros negZd;
+> Refine LtQI4;
+> 3 Refine negZb';
+> 2 Refine negZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtZ_timesZ_cancell b (timesZ a' d) (timesZ c b');
+> Refine posZb;
+> Refine LtZwd (timesZ b' (timesZ a d)) ? (timesZ b' (timesZ c b));
+> Refine LtZ_timesZl' b' (timesZ c b) (timesZ a d);
+> Refine negZb';
+> Refine LtQE2;
+> Refine q_lt_r;
+> Refine negZd;
+> Refine posZb;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 2: b is negZative
+> Intros negZb;
+> Refine PosZ_or_NegZ (pi2 ? ? q');
+> 3 Refine ratq';
+Case 2-1: b is negZative, b' is posZitive
+> 2 Intros posZb';
+> Refine PosZ_or_NegZ (pi2 ? ? r);
+> 3 Refine LtQratr;
+> 3 Refine q_lt_r;
+Case 2-1-1: b is negZative, b' and d are posZitive
+> 2 Intros posZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI1;
+> 3 Refine posZb';
+> 2 Refine posZd;
+> Refine LtZ_timesZ_cancell' b (timesZ c b') (timesZ a' d);
+> Refine negZb;
+> Refine LtZwd (timesZ b' (timesZ c b)) ? (timesZ b' (timesZ a d));
+> Refine LtZ_timesZl b' (timesZ c b) (timesZ a d);
+> Refine posZb';
+> Refine LtQE3;
+> Refine q_lt_r;
+> Refine posZd;
+> Refine negZb;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 2-1-2: b is negZative, b' is posZitive, d is negZative
+> Intros negZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI2 q' r;
+> 3 Refine posZb';
+> 2 Refine negZd;
+> Refine LtZ_timesZ_cancell' b (timesZ a' d) (timesZ c b');
+> Refine negZb;
+> Refine LtZwd (timesZ b' (timesZ a d)) ? (timesZ b' (timesZ c b));
+> Refine LtZ_timesZl b' (timesZ a d) (timesZ c b);
+> Refine posZb';
+> Refine LtQE4;
+> Refine q_lt_r;
+> Refine negZd;
+> Refine negZb;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 2-2: b and b' negZative
+> Intros negZb';
+> Refine PosZ_or_NegZ (pi2 ? ? r);
+> 3 Refine LtQratr;
+> 3 Refine q_lt_r;
+Case 2-2-1: b and b' negZative, d posZitive
+> 2 Intros posZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI3;
+> 3 Refine negZb';
+> 2 Refine posZd;
+> Refine LtZ_timesZ_cancell' b (timesZ a' d) (timesZ c b');
+> Refine negZb;
+> Refine LtZwd (timesZ b' (timesZ a d)) ? (timesZ b' (timesZ c b));
+> Refine LtZ_timesZl' b' (timesZ c b) (timesZ a d);
+> Refine negZb';
+> Refine LtQE3;
+> Refine q_lt_r;
+> Refine posZd;
+> Refine negZb;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+> ReturnAll;
+Case 2-2-2: b, b' and d negZative
+> Intros negZd;
+> [a = pi1 ? ? q];
+> [b = pi2 ? ? q];
+> [a' = pi1 ? ? q'];
+> [b' = pi2 ? ? q'];
+> [c = pi1 ? ? r];
+> [d = pi2 ? ? r];
+> Refine LtQI4;
+> 3 Refine negZb';
+> 2 Refine negZd;
+> Refine LtZ_timesZ_cancell' b (timesZ c b') (timesZ a' d);
+> Refine negZb;
+> Refine LtZwd (timesZ b' (timesZ c b)) ? (timesZ b' (timesZ a d));
+> Refine LtZ_timesZl' b' (timesZ a d) (timesZ c b);
+> Refine negZb';
+> Refine LtQE4;
+> Refine q_lt_r;
+> Refine negZd;
+> Refine negZb;
+Lemma b'(ad) = b(a'd)
+> Refine EqZ_trans ? (timesZ (timesZ b' a) d);
+> Refine EqZ_trans ? (timesZ (timesZ b a') d);
+> Refine timesZ_assocr;
+> Refine timesZwdl (timesZ b' a) (timesZ b a');
+> Refine EqZ_trans ? (timesZ a b');
+> Refine EqZ_trans ? (timesZ a' b);
+> Refine timesZ_comm;
+> Refine q_is_q';
+> Refine timesZ_comm;
+> Refine timesZ_assocl;
+Lemma b'(cb) = b(cb')
+> Refine EqZ_trans ? (timesZ (timesZ b' c) b);
+> Refine EqZ_trans ? (timesZ b (timesZ b' c));
+> Refine timesZwdr b (timesZ b' c) (timesZ c b');
+> Refine timesZ_comm;
+> Refine timesZ_comm (timesZ b' c);
+> Refine timesZ_assocl;
+> ReturnAll;
+> LtQwdl;
+ 
+> [LtQwdr : (q, r, r' : PreQ) Rational r' -> EqQ r r' -> LtQ q r -> LtQ q r'];
+
+> [LtQwd : (q, q', r, r' : PreQ) Rational q' -> Rational r' -> EqQ q q' -> EqQ r r' -> LtQ q r -> LtQ q' r'];
+
+> [ZtoQLt : (x, y : Int) LtZ x y -> LtQ x y];
+> [ZtoQLt' : (x, y : Int) LtQ x y -> LtZ x y];
+
+> Claim NtoQLt : (x, y : Nat) Lt x y -> LtQ x y; 
+> Intros x y x_lt_y;
+> Refine ZtoQLt x y;
+> Refine NtoZLt;
+> Refine x_lt_y;
+> ReturnAll;
+> NtoQLt;
+
+> Claim NtoQLt' : (x, y : Nat) LtQ x y -> Lt x y;
+> Intros x y x_lt_y;
+> Refine NtoZLt';
+> Refine ZtoQLt';
+> Refine x_lt_y;
+> ReturnAll;
+> NtoQLt';
+
+> Claim zero_LtQ_one : LtQ zero one;
+> Refine ZtoQLt zero one;
+> Refine zero_LtZ_one;
+> ReturnAll;
+> zero_LtQ_one;
+
+> [LtQ_trans : (q, r, s : PreQ) LtQ q r -> LtQ r s -> LtQ q s];
+
+> [LtQ_trichotomy : (q, r : PreQ) Rational q -> Rational r -> Or (LtQ q r) (Or (EqQ q r) (LtQ r q))];
+
+> [LtQ_irref : (q : PreQ) LtQ q q -> False];
+
+> [LtQ_plusQr : (q, r, s : PreQ) Rational s -> LtQ q r -> LtQ (plusQ q s) (plusQ r s)];
+> [LtQ_plusQl : (q, r, s : PreQ) Rational q -> LtQ r s -> LtQ (plusQ q r) (plusQ q s)];
+
+> [LtQ_minusQ : (q, r : PreQ) LtQ q r -> LtQ (minusQ r) (minusQ q)];
+
+> Claim minusone_LtQ_zero : LtQ (minusQ one) zero;
+> Refine LtQwdr;
+> 4 Refine (minusQ zero);
+> Refine LtQ_minusQ zero one;
+> Refine zero_LtQ_one;
+> Refine EqQ_ref;
+> Refine ZtoQtotal;
+> Refine zero;
+> ReturnAll;
+
+> [LtQ_timesQr : (q, r, s : PreQ) LtQ q r -> LtQ zero s -> LtQ (timesQ q s) (timesQ r s)];
+> [LtQ_timesQl : (q, r, s : PreQ) LtQ r s -> LtQ zero q -> LtQ (timesQ q r) (timesQ q s)];
+
+> [LtQ_timesQr' : (q, r, s : PreQ) LtQ q r -> LtQ s zero -> LtQ (timesQ r s) (timesQ q s)];
+> [LtQ_timesQl' : (q, r, s : PreQ) LtQ r s -> LtQ q zero -> LtQ (timesQ q s) (timesQ q r)];
+
+> [LtQ_timesQr_cancel : (q, r, s : PreQ) LtQ (timesQ q s) (timesQ r s) -> LtQ zero s -> LtQ q r];
+> [LtQ_timesQl_cancel : (q, r, s : PreQ) LtQ (timesQ q r) (timesQ q s) -> LtQ zero q -> LtQ r s];
+
+> [LtQ_timesQr'_cancel : (q, r, s : PreQ) LtQ (timesQ r s) (timesQ q s) -> LtQ s zero -> LtQ q r];
+> [LtQ_timesQl'_cancel : (q, r, s : PreQ) LtQ (timesQ q s) (timesQ q r) -> LtQ q zero -> LtQ r s];
+
+> [invQ_pos : (q : PreQ) LtQ zero q -> LtQ zero (invQ q)];
+
+> [LtQ_LeQ : (q, r : PreQ) LtQ q r -> LeQ q r];
+> [LtQ_LeQ_trans : (q, r, s : PreQ) LtQ q r -> LeQ r s -> LtQ q s];
+
+> [mean [q, r : PreQ] = timesQ (plusQ q r) (invQ two)];
+> [LtQ_dense : (q, r : PreQ) LtQ q r -> LtQ q (mean q r)];
+> [LtQ_dense' : (q, r : PreQ) LtQ q r -> LtQ (mean q r) r];

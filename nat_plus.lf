@@ -1,0 +1,126 @@
+> module nat_plus where;
+
+> import semigroup;
+> import nat;
+
+Addition
+
+> [plus = [m : Nat] E_Nat ([_ : Nat] Nat) m ([_ : Nat] succ)];
+
+> Claim plus_assocl : (m, n, p : Nat) Eq nat (plus m (plus n p)) (plus (plus m n) p);
+> Intros m n;
+> Refine Ind_Nat [p : Nat] eq nat (plus m (plus n p)) (plus (plus m n) p);
+> 2 Refine EqI;
+> Intros p;
+> Refine wd nat nat succ;
+> ReturnAll;
+
+> Claim plus_assocr : (m, n, p : Nat) Eq nat (plus (plus m n) p) (plus m (plus n p));
+> Intros m n p;
+> Refine sym;
+> Refine plus_assocl;
+> ReturnAll;
+
+> Claim zero_plus : (n : Nat) Eq nat (plus zero n) n;
+> Refine Ind_Nat [n : Nat] eq nat (plus zero n) n;
+> 2 Refine EqI;
+> Intros n;
+> Refine wd nat nat succ;
+> ReturnAll;
+> zero_plus;
+
+> Claim succ_plus : (m, n : Nat) Eq nat (plus m (succ n)) (plus (succ m) n);
+> Intros m;
+> Refine Ind_Nat [n : Nat] eq nat (plus m (succ n)) (plus (succ m) n);
+> 2 Refine EqI;
+> Intros n;
+> Refine wd nat nat succ;
+> ReturnAll;
+> succ_plus;
+
+> Claim plus_comm : (m, n : Nat) Eq nat (plus m n) (plus n m);
+> Intros m;
+> Refine Ind_Nat [n : Nat] eq nat (plus m n) (plus n m);
+> 2 Refine sym;
+> 2 Refine zero_plus;
+> Intros n mn_is_nm;
+> Refine trans;
+> Refine succ_plus;
+> Refine wd nat nat succ;
+> Refine mn_is_nm;
+> ReturnAll;
+> plus_comm;
+
+> Claim plus_cancelr : (m, n, p : Nat) Eq nat (plus m p) (plus n p) -> Eq nat m n;
+> Intros m n p;
+> Refine ImpE;
+> Refine Ind_Nat [p : Nat] imp (eq nat (plus m p) (plus n p)) (eq nat m n);
+> 2 Refine ImpI;
+> 2 Intros H;
+> Refine H;
+> ReturnAll;
+> Intros p ih;
+> Refine ImpI;
+> Intros H;
+> Refine ImpE;
+> 2 Refine ih;
+> Refine Peano3;
+> Refine H;
+> ReturnAll;
+> plus_cancelr;
+
+> Claim plus_cancell : (p, m, n : Nat) Eq nat (plus p m) (plus p n) -> Eq nat m n;
+> Intros p m n pm_is_pn;
+> Refine plus_cancelr ? ? p;
+> Refine trans nat ? (plus p m);
+> 2 Refine plus_comm;
+> Refine trans nat ? (plus p n);
+> 2 Refine pm_is_pn;
+> Refine plus_comm;
+> ReturnAll;
+> plus_cancell;
+
+> Claim m_plus_n_is_zeror : (m, n : Nat) Eq nat (plus m n) zero -> Eq nat n zero;
+> Intros m n mnzero;
+> Refine OrE;
+> Refine zero_or_succ n;
+> 2 Intros H;
+> Refine H;
+> ReturnAll;
+> Intros nSk;
+> Refine ExE Nat;
+> Refine nSk;
+> Intros k nSk';
+> Refine Peano4';
+> Refine trans;
+> Refine mnzero;
+> 2 Refine (plus m k);
+> Refine wd nat nat (plus m) (succ k);
+> Refine sym;
+> Refine nSk';
+> ReturnAll;
+> m_plus_n_is_zeror;
+
+> Claim m_plus_n_is_zerol : (m, n : Nat) Eq nat (plus m n) zero -> Eq nat m zero;
+> Intros m n m_plus_n_is_zero;
+> Refine trans;
+> Refine m_plus_n_is_zero;
+> Refine wd nat nat (plus m) zero;
+> Refine sym;
+> Refine m_plus_n_is_zeror;
+> Refine m_plus_n_is_zero;
+> ReturnAll;
+> m_plus_n_is_zerol;
+
+> Claim nat_four_lemma : (m, n, p, q : Nat) Eq nat (plus (plus m n) (plus p q))
+>  (plus (plus m p) (plus n q));
+> Intros m n p q;
+> Refine total_four_lemma Nat (Eq nat) plus;
+> Refine plus_comm;
+> Refine plus_assocl;
+> Refine wd2 nat nat nat plus;
+> ReturnAll;
+> Refine trans nat;
+> Refine sym nat;
+> Refine EqI nat;
+> ReturnAll;

@@ -1,0 +1,10 @@
+> module complex where;
+
+> import real;
+
+> [preC = Prod SInt2 SInt2];
+
+Complex Numbers
+
+> [complex [z : preC] = and (real (pi1 ? ? z)) (real (pi2 ? ? z))];
+> [Complex [z : preC] = And (Real (pi1 ? ? z)) (Real (pi2 ? ? z))];

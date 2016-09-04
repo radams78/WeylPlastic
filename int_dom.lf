@@ -1,0 +1,100 @@
+> module int_dom where;
+
+> import set;
+> import int;
+
+Domain of integers
+
+> [domint [M : Set Int] = all int [x:Int] all (prod nat nat) [y : Int] imp (eqZ x y) (imp (in Int x M) (in Int y M))];
+> [DomInt [M : Set Int] = All Int [x : Int] All Int [y : Int] Imp (EqZ x y) (Imp (In Int x M) (In Int y M))];
+
+> Claim DomIntI : (M : Set Int) ((x,y : Int) EqZ x y -> In Int x M -> In Int y M) -> DomInt M;
+> Intros M H;
+> Refine AllI;
+> Intros x;
+> Refine AllI;
+> Intros y;
+> Refine ImpI;
+> Intros x_is_y;
+> Refine ImpI;
+> Refine H;
+> Refine x_is_y;
+> ReturnAll;
+> DomIntI;
+
+> Claim DomIntE : (M : Set Int) (x,y : Int) DomInt M -> EqZ x y -> In Int x M -> In Int y M;
+> Intros M x y DomIntM x_is_y;
+> Refine ImpE;
+> Refine ImpE;
+> Refine x_is_y;
+> Refine AllE ? ? y (AllE ? ? x DomIntM);
+> ReturnAll;
+> DomIntE;
+
+> Claim DomIntwd : (M, M' : Set Int) Seteq ? M M' -> DomInt M -> DomInt M';
+> Intros M M' M_is_M' domintM;
+> Refine DomIntI;
+> Intros x y x_is_y x_in_M';
+> Refine SeteqE;
+> Refine DomIntE M;
+> Refine SeteqE';
+> Refine x_in_M';
+> Refine M_is_M';
+> Refine x_is_y;
+> Refine domintM;
+> Refine M_is_M';
+> ReturnAll;
+> DomIntwd;
+
+> [bindomint [M : Set (Prod Int Int)] = all int [x : Int] all int [x' : Int] all int [y : Int] all int [y' : Int]
+>   imp (eqZ x x') (imp (eqZ y y') (imp (in2 ? ? x y M) (in2 ? ? x' y' M)))];
+> [BinDomInt [M : Set (Prod Int Int)] = All Int [x : Int] All Int [x' : Int] All Int [y : Int] All Int [y' : Int]
+>   Imp (EqZ x x') (Imp (EqZ y y') (Imp (In2 ? ? x y M) (In2 ? ? x' y' M)))];
+
+> Claim BinDomIntI : (M : Set (Prod Int Int)) ((x,x',y,y':Int) EqZ x x' -> EqZ y y' -> In2 ? ? x y M -> In2 ? ? x' y' M) -> BinDomInt M;
+> Intros M H;
+> Refine AllI;
+> Intros x;
+> Refine AllI;
+> Intros x';
+> Refine AllI;
+> Intros y;
+> Refine AllI;
+> Intros y';
+> Refine ImpI;
+> Intros x_is_x';
+> Refine ImpI;
+> Intros y_is_y';
+> Refine ImpI;
+> Refine H;
+> Refine y_is_y';
+> Refine x_is_x';
+> ReturnAll;
+> BinDomIntI;
+
+> Claim BinDomIntE : (M : Set (Prod Int Int)) (x,x',y,y':Int) BinDomInt M -> EqZ x x' -> EqZ y y' -> In2 ? ? x y M -> In2 ? ? x' y' M;
+> Intros M x x' y y' bindomintM x_is_x' y_is_y';
+> Refine ImpE;
+> Refine ImpE;
+> Refine y_is_y';
+> Refine ImpE;
+> Refine x_is_x';
+> Refine AllE ? ? y' (AllE ? ? y (AllE ? ? x' (AllE ? ? x bindomintM)));
+> ReturnAll;
+> BinDomIntE;
+
+> Claim BinDomIntwd : (M, M' : Set (Prod Int Int)) Seteq ? M M' -> BinDomInt M -> BinDomInt M';
+> Intros M M' M_is_M' bindomintM;
+> Refine BinDomIntI;
+> Intros x x' y y' x_is_x' y_is_y' xy_in_M';
+> Refine SeteqE;
+> 2 Refine M_is_M';
+> Refine BinDomIntE;
+> 3 Refine x_is_x';
+> 2 Refine y_is_y';
+> Refine SeteqE';
+> Refine xy_in_M';
+> Refine M_is_M';
+> Refine bindomintM;
+> ReturnAll;
+> BinDomIntwd;

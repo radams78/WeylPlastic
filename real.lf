@@ -1,0 +1,101 @@
+> module real where;
+
+> import rat_ord;
+
+> [int2 = prod int int];
+> [Int2 = Prod Int Int];
+> [SInt2 = Set Int2];
+> [eqR = eqdomrat : SInt2 -> SInt2 -> prop];
+> [EqR = EqDomRat : SInt2 -> SInt2 -> Prop];
+
+> Claim EqR_ref : (x : SInt2) EqR x x;
+> Refine EqDomRat_ref;
+> ReturnAll;
+> EqR_ref;
+
+> Claim EqR_sym : (x, y : SInt2) EqR x y -> EqR y x;
+> Refine EqDomRat_sym;
+> ReturnAll;
+> EqR_sym;
+
+> Claim EqR_trans : (x, y, z : SInt2) EqR x y -> EqR y z -> EqR x z;
+> Refine EqDomRat_trans;
+> ReturnAll;
+> EqR_trans;
+
+> [cutt [M : SInt2] = and (domrat M) (all int2 [q : Int2] all int2 [r : Int2]
+>   imp (ltQ q r) (imp (in Int2 r M) (in Int2 q M)))];
+> [Cutt [M : SInt2] = And (DomRat M) (All Int2 [q : Int2] All Int2 [r : Int2]
+>   Imp (LtQ q r) (Imp (In Int2 r M) (In Int2 q M)))];
+
+> Claim CuttI : (M : SInt2) DomRat M -> ((q, r : Int2) LtQ q r -> In Int2 r M -> In Int2 q M) -> Cutt M;
+> Intros M domratM H;
+> Refine AndI;
+> 2 Refine domratM;
+> Refine AllI;
+> Intros q;
+> Refine AllI;
+> Intros r;
+> Refine ImpI;
+> Intros q_lt_r;
+> Refine ImpI;
+> Refine H;
+> Refine q_lt_r;
+> ReturnAll;
+> CuttI;
+
+> Claim Cutt_DomRat : (M : SInt2) Cutt M -> DomRat M;
+> Intros M;
+> Refine AndE1;
+> ReturnAll;
+> Cutt_DomRat;
+
+> Claim CuttE : (M : SInt2) (q, r : Int2) Cutt M -> LtQ q r -> In Int2 r M -> In Int2 q M;
+> Intros M q r cuttM q_lt_r;
+> Refine ImpE;
+> Refine ImpE;
+> Refine q_lt_r;
+> Refine AllE ? ? r (AllE ? ? q (AndE2 ? ? cuttM));
+> ReturnAll;
+> CuttE;
+
+> [Cuttwd : (M, M' : SInt2) EqR M M' -> Cutt M -> Cutt M'];
+
+> [open_cut [M : SInt2] = and (cutt M) (all int2 [q : Int2] imp (rational q) (imp (in Int2 q M)
+>   (ex int2 [r : Int2] and (ltQ q r) (in Int2 r M))))];
+> [Open_Cut [M : SInt2] = And (Cutt M) (All Int2 [q : Int2] Imp (Rational q) (Imp (In Int2 q M)
+>   (Ex Int2 [r : Int2] And (LtQ q r) (In Int2 r M))))];
+
+> [Open_CutI : (M : SInt2) Cutt M -> ((q : Int2) Rational q -> In Int2 q M -> Ex Int2 [r : Int2] And (LtQ q r) (In Int2 r M)) -> Open_Cut M];
+> [Open_Cut_Cutt : (M : SInt2) Open_Cut M -> Cutt M];
+> [Open_CutE : (M : SInt2) (q : Int2) Open_Cut M -> Rational q -> In Int2 q M -> Ex Int2 [r : Int2] And (LtQ q r) (In Int2 r M)];
+
+> [Open_Cutwd : (M, M' : SInt2) EqR M M' -> Open_Cut M -> Open_Cut M'];
+
+> [real [R : SInt2] = and (open_cut R)
+>   (and (ex int2 [q : ?] and (rational q) (in ? q R))
+>        (ex int2 [q : ?] and (rational q) (not (in ? q R))))];
+> [Real [R : SInt2] = And (Open_Cut R)
+>   (And (Ex ? [q : ?] And (Rational q) (In ? q R))
+>        (Ex ? [q : ?] And (Rational q) (Not (In ? q R))))];
+
+> [RealI : (R : SInt2) (q, r : Int2) Open_Cut R -> Rational q -> In ? q R -> Rational r -> Not (In ? r R) -> Real R];
+> [Real_Open_Cut : (R : SInt2) Real R -> Open_Cut R];
+> [Real_mem : (R : SInt2) Real R -> Ex ? [q : Int2] And (Rational q) (In ? q R)];
+> [Real_nmem : (R : SInt2) Real R -> Ex ? [q : Int2] And (Rational q) (Not (In ? q R))];
+
+> [Realwd : (R, R' : SInt2) EqR R R' -> Real R -> Real R'];
+
+> [R = set ? real];
+
+> [QtoR [r : Int2] = set Int2 [q : Int2] ltQ q r : SInt2];
+> Coercion = QtoR;
+
+> [QtoRwd : (q, r : Int2) Rational q -> Rational r -> EqQ q r -> EqR q r];
+> [QtoRwd' : (q, r : Int2) Rational q -> Rational r -> EqR q r -> EqQ q r];
+> [QtoRtotal : (q : Int2) Rational q -> Real q];
+
+> [ZtoR [x : Int] = QtoR (ZtoQ x)];
+
+> [ZtoRtotal : (x : Int) Real x];
+> [NtoR [n : Nat] = ZtoR (NtoZ n)];

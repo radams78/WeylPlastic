@@ -1,0 +1,307 @@
+> module set where;
+
+> import weyl;
+
+> [seteq = [tau : U] [A,B : Set (T tau)] all tau [x : T tau] iff (in (T tau) x A) (in (T tau) x B)];
+> [Seteq = [tau : Type] [A,B : Set tau] All tau [x : tau] Iff (In tau x A) (In tau x B)];
+
+> Claim SeteqI : (tau : Type) (A, B : Set tau) ((x : tau) In tau x A -> In tau x B) -> ((x : tau) In tau x B -> In tau x A) ->
+>   Seteq tau A B;
+> Intros tau A B A_sub_B B_sub_A;
+> Refine AllI;
+> Intros x;
+> Refine IffI;
+> Refine B_sub_A;
+> Refine A_sub_B;
+> ReturnAll;
+> SeteqI;
+
+> Claim SeteqE : (tau : Type) (A, B : Set tau) (a : tau) Seteq tau A B -> In tau a A -> In tau a B;
+> Intros tau A B a A_is_B;
+> Refine IffE1;
+> Refine AllE ? ? a A_is_B;
+> ReturnAll;
+> SeteqE;
+
+> Claim SeteqE' : (tau : Type) (A, B : Set tau) (a : tau) Seteq tau A B -> In tau a B -> In tau a A;
+> Intros tau A B a A_is_B;
+> Refine IffE2;
+> Refine AllE ? ? a A_is_B;
+> ReturnAll;
+> SeteqE';
+
+> Claim Seteq_ref : (tau : Type) (A : Set tau) Seteq tau A A;
+> Intros tau A;
+> Refine SeteqI;
+> Intros x H;
+> Refine H;
+> ReturnAll;
+> Intros x H;
+> Refine H;
+> ReturnAll;
+> Seteq_ref;
+
+> Claim Seteq_sym : (tau : Type) (A, B : Set tau) Seteq tau A B -> Seteq tau B A;
+> Intros tau A B A_is_B;
+> Refine SeteqI;
+> Intros x;
+> Refine SeteqE;
+> Refine A_is_B;
+> ReturnAll;
+> Intros x;
+> Refine SeteqE';
+> Refine A_is_B;
+> ReturnAll;
+> Seteq_sym;
+
+> Claim Seteq_trans : (tau : Type) (A, B, C : Set tau) Seteq tau A B -> Seteq tau B C -> Seteq tau A C;
+> Intros tau A B C A_is_B B_is_C;
+> Refine SeteqI;
+> Intros x x_in_C;
+> Refine SeteqE' tau A B;
+> Refine SeteqE' tau B C;
+> Refine x_in_C;
+> Refine B_is_C;
+> Refine A_is_B;
+> ReturnAll;
+> Intros x x_in_A;
+> Refine SeteqE tau B C;
+> Refine SeteqE tau A B;
+> Refine x_in_A;
+> Refine A_is_B;
+> Refine B_is_C;
+> ReturnAll;
+> Seteq_trans;
+
+> [sub = [tau : U] [A,B : Set (T tau)] all tau [x : T tau] imp (in (T tau) x A) (in (T tau) x B)];
+> [Sub = [tau : Type] [A,B : Set tau] All tau [x : tau] Imp (In tau x A) (In tau x B)];
+
+> Claim SubI : (tau : Type) (A, B : Set tau) ((x : tau) In tau x A -> In tau x B) -> Sub tau A B;
+> Intros tau A B H;
+> Refine AllI;
+> Intros x;
+> Refine ImpI;
+> Refine H;
+> ReturnAll;
+> SubI;
+
+> Claim SubE : (tau : Type) (A, B : Set tau) (x : tau) Sub tau A B -> In tau x A -> In tau x B;
+> Intros tau A B x A_sub_B;
+> Refine ImpE;
+> Refine AllE ? ? x A_sub_B;
+> ReturnAll;
+> SubE;
+
+> Claim Subwdl : (tau : Type) (A, A', B : Set tau) Seteq tau A A' -> Sub tau A B -> Sub tau A' B;
+> Intros tau A A' B A_is_A' A_sub_B;
+> Refine SubI;
+> Intros x x_in_A';
+> Refine SubE;
+> 2 Refine A_sub_B;
+> Refine SeteqE';
+> Refine x_in_A';
+> Refine A_is_A';
+> ReturnAll;
+> Subwdl;
+
+> Claim Subwdr : (tau : Type) (A, B, B' : Set tau) Seteq tau B B' -> Sub tau A B -> Sub tau A B';
+> Intros tau A B B' B_is_B' A_sub_B;
+> Refine SubI;
+> Intros x x_in_A;
+> Refine SeteqE;
+> 2 Refine B_is_B';
+> Refine SubE;
+> Refine x_in_A;
+> Refine A_sub_B;
+> ReturnAll;
+> Subwdr;
+
+> [psub = [tau : U] [A,B : Set (T tau)] and (sub tau A B) (not (seteq tau A B))];
+> [PSub = [tau : Type] [A,B : Set tau] And (Sub tau A B) (Not (Seteq tau A B))];
+
+> [disjoint = [tau : U] [A,B : Set (T tau)] all tau [x : T tau] imp (in (T tau) x A) (imp (in (T tau) x B) false)];
+> [Disjoint = [tau : Type] [A,B : Set tau] All tau [x : tau] Imp (In tau x A) (Imp (In tau x B) False)];
+
+> Claim DisjointI : (tau : Type) (A, B : Set tau) ((x : tau) In tau x A -> In tau x B -> False) -> Disjoint tau A B;
+> Intros tau A B H;
+> Refine AllI;
+> Intros x;
+> Refine ImpI;
+> Intros x_in_A;
+> Refine ImpI;
+> Refine H;
+> Refine x_in_A;
+> ReturnAll;
+> DisjointI;
+
+> Claim DisjointE : (tau : Type) (A, B : Set tau) (a : tau) Disjoint tau A B -> In tau a A -> In tau a B -> False;
+> Intros tau A B a A_B_Disjoint a_in_A;
+> Refine ImpE;
+> Refine ImpE;
+> Refine a_in_A;
+> Refine AllE ? ? a A_B_Disjoint;
+> ReturnAll;
+> DisjointE;
+
+> [empty = [tau : Type] set tau [x : tau] false];
+
+> Claim empty_sub : (tau : Type) (A : Set tau) Sub tau (empty tau) A;
+> Intros tau A;
+> Refine AllI;
+> Intros x;
+> Refine ImpI;
+> Intros x_in_emp;
+> Refine FalseE;
+> Refine x_in_emp;
+> ReturnAll;
+> empty_sub;
+
+> [full = [tau : Type] set tau [x : tau] true];
+
+> Claim sub_full : (tau : Type) (A : Set tau) Sub tau A (full tau);
+> Intros tau A;
+> Refine AllI;
+> Intros x;
+> Refine ImpI;
+> Intros x_in_A;
+> Equiv V (imp false false);
+> Refine TrueI;
+> ReturnAll;
+> sub_full;
+
+> [comp = [tau : Type] [A : Set tau] set tau [x : tau] not (in tau x A)];
+
+> Claim comp_wd : (tau : Type) (A, A' : Set tau) Seteq tau A A' -> Seteq tau (comp tau A) (comp tau A');
+> Intros tau A A' A_is_A';
+> Refine SeteqI;
+> 2 Intros x x_notin_A;
+> Refine NotI;
+> Intros x_in_A';
+> Refine NotE;
+> 2 Refine x_notin_A;
+> Refine SeteqE' ? A A' x;
+> Refine x_in_A';
+> Refine A_is_A';
+> ReturnAll;
+> Intros x x_notin_A';
+> Refine NotI;
+> Intros x_in_A;
+> Refine NotE;
+> 2 Refine x_notin_A';
+> Refine SeteqE;
+> 2 Refine A_is_A';
+> Refine x_in_A;
+> ReturnAll;
+> comp_wd;
+
+> [union = [tau : Type] [A, B : Set tau] set tau [x : tau] or (in tau x A) (in tau x B)];
+> [inter = [tau : Type] [A, B : Set tau] set tau [x : tau] and (in tau x A) (in tau x B)];
+
+> Claim inter_wd : (tau : Type) (A, A', B, B' : Set tau) Seteq tau A A' -> Seteq tau B B' ->
+>   Seteq tau (inter ? A B) (inter ? A' B');
+> Intros tau A A' B B' A_is_A' B_is_B';
+> Refine SeteqI;
+> Intros x;
+> Refine AndE;
+> Intros x_in_A' x_in_B';
+> Refine AndI;
+> 2 Refine SeteqE' ? A A' x;
+> 3 Refine A_is_A';
+> 2 Refine x_in_A';
+> Refine SeteqE' ? B B' x B_is_B' x_in_B';
+> ReturnAll;
+> Intros x;
+> Refine AndE;
+> Intros x_in_A x_in_B;
+> Refine AndI;
+> 2 Refine SeteqE ? A A' x A_is_A' x_in_A;
+> Refine SeteqE ? B B' x B_is_B' x_in_B;
+> ReturnAll;
+> inter_wd;
+
+> [setminus = [tau : Type] [A, B : Set tau] inter tau A (comp tau B)];
+
+> Claim setminus_wd : (tau : Type) (A, A', B, B' : Set tau) Seteq tau A A' -> Seteq tau B B' ->
+>   Seteq tau (setminus ? A B) (setminus ? A' B');
+> Intros tau A A' B B' A_is_A' B_is_B';
+> Refine inter_wd tau A A' (comp ? B) (comp ? B');
+> 2 Refine A_is_A';
+> Refine comp_wd;
+> Refine B_is_B';
+> ReturnAll;
+> setminus_wd;
+
+> [single = [tau : U] [a : T tau] set (T tau) (eq tau a)];
+
+> [setminus' = [tau : U] [A : Set (T tau)] [a : T tau] setminus (T tau) A (single tau a)];
+
+> Claim setminus'_wd : (tau : U) (A, B : Set (T tau)) (a : T tau) Seteq (T tau) A B -> Seteq (T tau) (setminus' tau A a) (setminus' tau B a);
+> Intros tau A B a A_is_B;
+> Refine setminus_wd (T tau) A B (single tau a) (single tau a);
+> 2 Refine A_is_B;
+> Refine Seteq_ref;
+> ReturnAll;
+
+> Claim setminus'_mono : (tau : U) (A, B : Set (T tau)) (a : T tau) Sub (T tau) A B -> Sub (T tau) (setminus' tau A a) (setminus' tau B a);
+> Intros tau A B a A_sub_B;
+> Refine SubI;
+> Intros x;
+> Refine AndE;
+> Intros x_in_A a_not_x;
+> Refine AndI;
+> 2 Refine SubE ? A B x A_sub_B x_in_A;
+> Refine a_not_x;
+> ReturnAll;
+
+> [setplus' = [tau : U] [A : Set (T tau)] [a : T tau] union (T tau) A (single tau a)];
+
+> Claim setminus'_setplus' : (tau : U) (A : Set (T tau)) (a : T tau) Not (In ? a A) -> Seteq ? (setminus' tau (setplus' tau A a) a) A;
+> Intros tau A a a_notin_A;
+> Refine SeteqI;
+> Intros x x_in_A;
+> Refine AndI;
+> Refine NotI;
+> Intros a_is_x;
+> Refine NotE;
+> 2 Refine a_notin_A;
+> Refine EqE' tau ([z:T tau] In (T tau) z A) a x;
+> Refine x_in_A;
+> Refine a_is_x;
+> ReturnAll;
+> Refine OrI1;
+> Refine x_in_A;
+> ReturnAll;
+> Intros x;
+> Refine AndE;
+> Intros x_in_Aa a_not_x;
+> Refine OrE;
+> Refine x_in_Aa;
+> Refine NotE';
+> Refine a_not_x;
+> Intros x_in_A;
+> Refine x_in_A;
+> ReturnAll;
+> setminus'_setplus';
+
+> Claim setplus'_setminus' : (tau : U) (A : Set (T tau)) (a : T tau) In ? a A -> Seteq ? (setplus' tau (setminus' tau A a) a) A;
+> Intros tau A a a_in_A;
+> Refine SeteqI;
+> Intros x x_in_A;
+> Refine exmid (Eq ? a x);
+> Intros a_not_x;
+> Refine OrI1;
+> Refine AndI;
+> Refine a_not_x;
+> Refine x_in_A;
+> ReturnAll;
+> Refine OrI2;
+> ReturnAll;
+> Intros x;
+> Refine OrE;
+> Refine EqE tau ([z : T tau] In (T tau) z A);
+> Refine a_in_A;
+> Refine AndE;
+> Intros x_in_A _;
+> Refine x_in_A;
+> ReturnAll;
+> setplus'_setminus';

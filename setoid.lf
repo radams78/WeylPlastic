@@ -1,0 +1,101 @@
+> module setoid where;
+
+> import preorder;
+> import psetoid;
+
+> [setoid = [A : Type][eA : A -> A -> Prop]
+>  And (reflexive A eA)
+>  (And (symmetric A eA) (transitive A eA))];
+
+> [setoidI : (A : Type) (eA : A -> A -> Prop)
+>  ((x : A) eA x x) ->
+>  ((x,y : A) eA x y -> eA y x) ->
+>  ((x,y,z : A) eA x y -> eA y z -> eA x z) ->
+>  setoid A eA];
+ Claim setoidI : (A : Type) (eA : A -> A -> Prop)
+  ((x : A) eA x x) ->
+  ((x,y : A) eA x y -> eA y x) ->
+  ((x,y,z : A) eA x y -> eA y z -> eA x z) ->
+  setoid A eA;
+ Intros A eA r s t;
+ Refine AndI;
+ Refine AndI;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine AllI;
+ Intros z;
+ Refine ImpI;
+ Refine AndE;
+ Refine t;
+ ReturnAll;
+ Refine AllI;
+ Intros x;
+ Refine AllI;
+ Intros y;
+ Refine ImpI;
+ Refine s;
+ ReturnAll;
+ Refine AllI;
+ Refine r;
+ ReturnAll;
+
+> [setoid_ref : (A : Type) (eA : A -> A -> Prop) (a : A)
+>  setoid A eA -> eA a a];
+ Claim setoid_ref : (A : Type) (eA : A -> A -> Prop) (a : A)
+  setoid A eA -> eA a a;
+ Intros A eA a H;
+ Refine AllE ? ? ? (AndE1 ? ? H);
+ ReturnAll;
+
+> [setoid_sym : (A : Type) (eA : A -> A -> Prop) (a,b : A)
+>  setoid A eA -> eA a b -> eA b a];
+ Claim setoid_sym : (A : Type) (eA : A -> A -> Prop) (a,b : A)
+  setoid A eA -> eA a b -> eA b a;
+ Intros A eA a b H;
+ Refine ImpE;
+ Refine AllE ? ? ? (AllE ? ? ? (AndE1 ? ? (AndE2 ? ? H)));
+ ReturnAll;
+
+> [setoid_trans : (A : Type) (eA : A -> A -> Prop) (a,b,c : A)
+>  setoid A eA -> eA a b -> eA b c -> eA a c];
+ Claim setoid_trans : (A : Type) (eA : A -> A -> Prop) (a,b,c : A)
+  setoid A eA -> eA a b -> eA b c -> eA a c;
+ Intros A eA a b c H a_is_b b_is_c;
+ Refine ImpE;
+ 2 Refine AllE ? ? ? (AllE ? ? b (AllE ? ? ? (AndE2 ? ? (AndE2 ? ? H))));
+ Refine AndI;
+ Refine b_is_c;
+ Refine a_is_b;
+ ReturnAll;
+
+> [setoid_preorder : (A : Type) (eA : A -> A -> Prop)
+>  setoid A eA -> preorder A eA];
+ Claim setoid_preorder : (A : Type) (eA : A -> A -> Prop)
+  setoid A eA -> preorder A eA;
+ Intros A eA H;
+ Refine preorderI;
+ Intros x y z;
+ Refine setoid_trans A eA;
+ Refine H;
+ ReturnAll;
+ Intros x;
+ Refine setoid_ref A eA;
+ Refine H;
+ ReturnAll;
+
+> [setoid_psetoid : (A : Type) (eA : A -> A -> Prop)
+>  setoid A eA -> psetoid A eA];
+ Claim setoid_psetoid : (A : Type) (eA : A -> A -> Prop)
+  setoid A eA -> psetoid A eA;
+ Intros A eA H;
+ Refine psetoidI;
+ Intros x y z;
+ Refine setoid_trans A eA;
+ Refine H;
+ ReturnAll;
+ Intros x y;
+ Refine setoid_sym A eA;
+ Refine H;
+ ReturnAll;

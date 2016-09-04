@@ -1,0 +1,178 @@
+> module int_plus where;
+
+> import int;
+
+> [plusZ [x,y : Int] = minus (plus (pi1 ? ? x) (pi1 ? ? y)) (plus (pi2 ? ? x) (pi2 ? ? y))];
+
+> Claim plusZwdl : (x, x', y : Int) EqZ x x' -> EqZ (plusZ x y) (plusZ x' y);
+> Intros x x' y x_is_x';
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [a' = pi1 ? ? x'];
+> [b' = pi2 ? ? x'];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> Refine trans nat (plus (plus a c) (plus b' d)) (plus a (plus c (plus b' d))) (plus (plus a' c) (plus b d));
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus a (plus b' (plus d c)));
+> 2 Refine wd nat nat (plus a);
+> 2 Refine trans nat ? (plus (plus b' d) c);
+> 3 Refine plus_comm;
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus (plus a b') (plus d c));
+> 2 Refine plus_assocl;
+> Refine trans nat ? (plus (plus a' b) (plus d c));
+> 2 Refine wd nat nat [z : Nat] plus z (plus d c);
+> 2 Refine x_is_x';
+> Refine trans nat ? (plus a' (plus b (plus d c)));
+> 2 Refine plus_assocr;
+> Refine trans nat ? (plus a' (plus c (plus b d)));
+> 2 Refine wd nat nat (plus a');
+> 2 Refine trans nat ? (plus (plus b d) c);
+> 3 Refine plus_assocl;
+> 2 Refine plus_comm;
+> Refine plus_assocl;
+> ReturnAll;
+> plusZwdl;
+
+> Claim plusZ_comm : (x, y : Int) EqZ (plusZ x y) (plusZ y x);
+> Intros x y;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> Refine wd2 nat nat nat plus;
+> Refine plus_comm;
+> Refine plus_comm;
+> ReturnAll;
+> plusZ_comm;
+
+> Claim plusZwdr : (x, y, y' : Int) EqZ y y' -> EqZ (plusZ x y) (plusZ x y');
+> Intros x y y' y_is_y';
+> Refine EqZ_trans ? (plusZ y x);
+> Refine EqZ_trans ? (plusZ y' x);
+> Refine plusZ_comm;
+> Refine plusZwdl;
+> Refine y_is_y';
+> Refine plusZ_comm;
+> ReturnAll;
+> plusZwdr;
+
+> Claim plusZwd : (x, x', y, y' : Int) EqZ x x' -> EqZ y y' -> EqZ (plusZ x y) (plusZ x' y');
+> Intros x x' y y' x_is_x' y_is_y';
+> Refine EqZ_trans ? (plusZ x' y);
+> Refine plusZwdr;
+> Refine y_is_y';
+> Refine plusZwdl;
+> Refine x_is_x';
+> ReturnAll;
+> plusZwd;
+
+> Claim NtoZplus : (m, n : Nat) EqZ (plus m n) (plusZ m n);
+> Intros m n;
+> Refine EqI nat (plus m n);
+> ReturnAll;
+> NtoZplus;
+
+> Claim plusZ_assocr : (x, y, z : Int) EqZ (plusZ (plusZ x y) z) (plusZ x (plusZ y z));
+> Intros x y z;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> [e = pi1 ? ? z];
+> [f = pi2 ? ? z];
+> Refine wd2 nat nat nat plus;
+> Refine plus_assocl;
+> Refine plus_assocr;
+> ReturnAll;
+> plusZ_assocr;
+
+> Claim plusZ_assocl : (x, y, z : Int) EqZ (plusZ x (plusZ y z)) (plusZ (plusZ x y) z);
+> Intros x y z;
+> Refine EqZ_sym;
+> Refine plusZ_assocr;
+> ReturnAll;
+> plusZ_assocl;
+
+> Claim plusZ_zero : (x : Int) EqZ (plusZ x zero) x;
+> Intros x;
+> Refine EqZ_ref;
+> ReturnAll;
+> plusZ_zero;
+
+> [minusZ [x : Int] = minus (pi2 ? ? x) (pi1 ? ? x)];
+
+> Claim minusZwd : (x, x' : Int) EqZ x x' -> EqZ (minusZ x) (minusZ x');
+> Intros x x' x_is_x';
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [a' = pi1 ? ? x'];
+> [b' = pi2 ? ? x'];
+> Refine trans nat (plus b a') (plus a' b) (plus b' a);
+> 2 Refine plus_comm;
+> Refine trans nat ? (plus a b');
+> 2 Refine sym;
+> 2 Refine x_is_x';
+> Refine plus_comm;
+> ReturnAll;
+> minusZwd;
+
+> Claim plusZ_minusZ : (x : Int) EqZ (plusZ x (minusZ x)) zero;
+> Intros x;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> Refine trans nat (plus a b) (plus b a) (plus zero (plus b a));
+> 2 Refine plus_comm;
+> Refine sym;
+> Refine zero_plus;
+> ReturnAll;
+> plusZ_minusZ;
+
+> Claim plusZ_minusZ' : (x, y : Int) EqZ (plusZ (plusZ x y) (minusZ y)) x;
+> Intros x y;
+> Refine EqZ_trans ? (plusZ x (plusZ y (minusZ y)));
+> 2 Refine plusZ_assocr x y (minusZ y);
+> Refine EqZ_trans ? (plusZ x zero);
+> 2 Refine plusZwd x x (plusZ y (minusZ y)) zero;
+> 3 Refine EqZ_ref;
+> 2 Refine plusZ_minusZ;
+> Refine plusZ_zero;
+> ReturnAll;
+> plusZ_minusZ';
+
+> Claim minusZ_minusZ : (x : Int) EqZ (minusZ (minusZ x)) x;
+> Intros x;
+> Refine EqZ_ref;
+> ReturnAll;
+> minusZ_minusZ;
+
+> Claim minusZ_plusZ_minusZ : (x, y : Int) EqZ (plusZ (minusZ x) (minusZ y)) (minusZ (plusZ x y));
+> Intros x y;
+> Refine EqZ_ref;
+> ReturnAll;
+> minusZ_plusZ_minusZ;
+
+> Claim plusZ_cancelr : (x, y, z : Int) EqZ (plusZ x z) (plusZ y z) -> EqZ x y;
+> Intros x y z xz_is_yz;
+> Refine EqZ_trans ? (plusZ (plusZ x z) (minusZ z));
+> 2 Refine EqZ_sym (plusZ (plusZ x z) (minusZ z));
+> 2 Refine plusZ_minusZ';
+> Refine EqZ_trans ? (plusZ (plusZ y z) (minusZ z));
+> Refine plusZ_minusZ';
+> Refine plusZwd (plusZ x z) (plusZ y z) (minusZ z) (minusZ z);
+> Refine EqZ_ref;
+> Refine xz_is_yz;
+> ReturnAll;
+> plusZ_cancelr;
+
+> Claim plusZ_cancell : (x, y, z : Int) EqZ (plusZ z x) (plusZ z y) -> EqZ x y;
+> Intros x y z zx_is_zy;
+> Refine plusZ_cancelr;
+> Refine EqZ_trans (plusZ x z) (plusZ z x) (plusZ y z);
+> Refine EqZ_trans (plusZ z x) (plusZ z y) (plusZ y z);
+> Refine plusZ_comm;
+> Refine zx_is_zy;
+> Refine plusZ_comm;
+> ReturnAll;
+> plusZ_cancell;

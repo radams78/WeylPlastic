@@ -1,0 +1,1052 @@
+> module int_ord where;
+
+> import nat_ord;
+> import int_times;
+
+Ordering on integers
+
+Weak inequality
+
+> [leZ [x, y : Int] = le (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+> [LeZ [x, y : Int] = Le (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+
+> Claim LeZwdl : (x, x', y : Int) EqZ x x' -> LeZ x y -> LeZ x' y;
+> Intros x x' y x_is_x' x_le_y;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [a' = pi1 ? ? x'];
+> [b' = pi2 ? ? x'];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> Refine Le_plus_cancell b (plus a' d) (plus c b');
+> Refine EqE2 nat nat Le (plus b' (plus a d)) ? (plus b' (plus c b));
+> Refine Le_plusl b' (plus a d) (plus c b);
+> Refine x_le_y;
+> Refine trans nat ? (plus (plus b' c) b);
+> Refine trans nat ? (plus (plus c b') b);
+> Refine plus_comm;
+> Refine wd nat nat [z : Nat] plus z b;
+> Refine plus_comm;
+> Refine plus_assocl;
+> Refine trans nat ? (plus (plus b' a) d);
+> Refine trans nat ? (plus (plus b a') d);
+> Refine plus_assocr;
+> Refine wd nat nat [z : Nat] plus z d;
+> Refine trans nat ? (plus a b');
+> Refine trans nat ? (plus a' b);
+> Refine plus_comm;
+> Refine x_is_x';
+> Refine plus_comm;
+> Refine plus_assocl;
+> ReturnAll;
+> LeZwdl;
+
+> Claim LeZwdr : (x, y, y' : Int) EqZ y y' -> LeZ x y -> LeZ x y';
+> Intros x y y' y_is_y' x_le_y;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> [c' = pi1 ? ? y'];
+> [d' = pi2 ? ? y'];
+> Refine Le_plus_cancelr (plus a d') (plus c' b) c;
+> Refine EqE2 nat nat Le (plus (plus a d) c') ? (plus (plus c b) c');
+> Refine Le_plusr;
+> Refine x_le_y;
+> Refine trans nat ? (plus c' (plus c b));
+> Refine trans nat ? (plus c' (plus b c));
+> Refine plus_assocl;
+> Refine wd nat nat (plus c') (plus c b) (plus b c);
+> Refine plus_comm;
+> Refine plus_comm;
+> Refine trans nat ? (plus a (plus d c'));
+> Refine trans nat ? (plus a (plus d' c));
+> Refine plus_assocl;
+> Refine wd nat nat (plus a) (plus d c') (plus d' c);
+> Refine trans nat ? (plus c' d);
+> Refine trans nat ? (plus c d');
+> Refine plus_comm;
+> Refine sym;
+> Refine y_is_y';
+> Refine plus_comm;
+> Refine plus_assocr;
+> ReturnAll;
+> LeZwdr;
+
+> Claim LeZwd : (x, x', y, y' : Int) EqZ x x' -> EqZ y y' -> LeZ x y -> LeZ x' y';
+> Intros x x' y y' x_is_x' y_is_y' x_le_y;
+> Refine LeZwdl;
+> Refine LeZwdr;
+> Refine x_le_y;
+> Refine y_is_y';
+> Refine x_is_x';
+> ReturnAll;
+> LeZwd;
+
+> Claim NtoZLe : (m, n : Nat) Le m n -> LeZ m n;
+> Intros m n m_le_n;
+> Refine m_le_n;
+> ReturnAll;
+
+> Claim NtoZLe' : (m, n : Nat) LeZ m n -> Le m n;
+> Intros m n m_le_n;
+> Refine m_le_n;
+> ReturnAll;
+
+> Claim LeZ_ref : (x : Int) LeZ x x;
+> Intros x;
+> Refine Le_ref;
+> ReturnAll;
+
+> Claim LeZ_trans : (x, y, z : Int) LeZ x y -> LeZ y z -> LeZ x z;
+> Intros x y z x_le_y y_le_z;
+> [a = pi1 ? ? x];
+> [b = pi2 ? ? x];
+> [c = pi1 ? ? y];
+> [d = pi2 ? ? y];
+> [e = pi1 ? ? z];
+> [f = pi2 ? ? z];
+> Refine Le_plus_cancelr (plus a f) (plus e b) d;
+> Refine Le_trans ? (plus (plus c b) f);
+> Refine EqE2 nat nat Le (plus (plus c f) b) ? (plus (plus e d) b);
+> Refine Le_plusr;
+> Refine y_le_z;
+> Refine trans nat ? (plus e (plus d b));
+> Refine trans nat ? (plus e (plus b d));
+> Refine plus_assocl;
+> Refine wd nat nat (plus e) (plus d b) (plus b d);
+> Refine plus_comm;
+> Refine plus_assocr;
+> Refine trans nat ? (plus c (plus f b));
+> Refine trans nat ? (plus c (plus b f));
+> Refine plus_assocl;
+> Refine wd nat nat (plus c) (plus f b) (plus b f);
+> Refine plus_comm;
+> Refine plus_assocr;
+> Refine EqE nat ([x : Nat] Le x (plus (plus c b) f)) (plus (plus a d) f) (plus (plus a f) d);
+> Refine trans nat ? (plus a (plus d f));
+> Refine trans nat ? (plus a (plus f d));
+> Refine plus_assocl;
+> Refine wd nat nat (plus a);
+> Refine plus_comm;
+> Refine plus_assocr;
+> Refine Le_plusr;
+> Refine x_le_y;
+> ReturnAll;
+
+> Claim LeZ_antisym : (x, y : Int) LeZ x y -> LeZ y x -> EqZ x y;
+> Intros x y;
+> Refine Le_antisym;
+> ReturnAll;
+
+> Claim LeZ_total : (x, y : Int) Or (LeZ x y) (LeZ y x);
+> Intros x y;
+> Refine Le_total;
+> ReturnAll;
+
+> Claim EqZ_LeZ : (x, y : Int) EqZ x y -> LeZ x y;
+> Intros x y x_is_y;
+> Refine LeZwdr;
+> Refine LeZ_ref;
+> Refine x_is_y;
+> ReturnAll;
+> EqZ_LeZ;
+
+> [LeZ_plusZr : (x,y,z : Int) LeZ x y -> LeZ (plusZ x z) (plusZ y z)];
+ Claim LeZ_plusZr : (x, y, z : Int) LeZ x y -> LeZ (plusZ x z) (plusZ y z);
+ Intros x y z x_le_y;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine EqE2 nat nat Le (plus (plus a d) (plus e f)) (plus (plus a e) (plus d f))
+  (plus (plus c b) (plus e f)) (plus (plus c e) (plus b f));
+ Refine Le_plusr;
+ Refine x_le_y;
+ Refine nat_four_lemma;
+ Refine nat_four_lemma;
+ ReturnAll;
+
+> [LeZ_plusZl : (x, y, z : Int) LeZ y z -> LeZ (plusZ x y) (plusZ x z)];
+ Claim LeZ_plusZl : (x,y,z : Int) LeZ y z -> LeZ (plusZ x y) (plusZ x z);
+ Intros x y z y_le_z;
+ Refine LeZwd;
+ Refine LeZ_plusZr y z x;
+ Refine y_le_z;
+ Refine plusZ_comm;
+ Refine plusZ_comm;
+ ReturnAll;
+
+> [LeZ_plusZ : (a,b,c,d:Int) LeZ a b -> LeZ c d -> LeZ (plusZ a c) (plusZ b d)];
+ Claim LeZ_plusZ : (a,b,c,d:Int) LeZ a b -> LeZ c d -> LeZ (plusZ a c) (plusZ b d);
+ Intros a b c d a_le_b c_le_d;
+ Refine LeZ_trans ? (plusZ b c);
+ Refine LeZ_plusZl;
+ Refine c_le_d;
+ Refine LeZ_plusZr;
+ Refine a_le_b;
+ ReturnAll;
+
+> [LeZ_plusZ_cancelr : (x, y, z : Int) LeZ (plusZ x z) (plusZ y z) -> LeZ x y];
+ Claim LeZ_plusZ_cancelr : (x,y,z : Int) LeZ (plusZ x z) (plusZ y z) -> LeZ x y;
+ Intros x y z xz_le_yz;
+ Refine LeZwd (plusZ (plusZ x z) (minusZ z)) x (plusZ (plusZ y z) (minusZ z));
+ Refine LeZ_plusZr (plusZ x z) (plusZ y z) (minusZ z);
+ Refine xz_le_yz;
+ Refine plusZ_minusZ';
+ Refine plusZ_minusZ';
+ ReturnAll;
+
+> [LeZ_plusZ_cancell : (x, y, z : Int) LeZ (plusZ x y) (plusZ x z) -> LeZ y z];
+ Claim LeZ_plusZ_cancell : (x,y,z : Int) LeZ (plusZ x y) (plusZ x z) -> LeZ y z;
+ Intros x y z xy_le_xz;
+ Refine LeZ_plusZ_cancelr;
+ Refine LeZwd;
+ Refine xy_le_xz;
+ Refine plusZ_comm;
+ Refine plusZ_comm;
+ ReturnAll;
+
+> [LeZ_minusZ : (x,y : Int) LeZ x y -> LeZ (minusZ y) (minusZ x)];
+ Claim LeZ_minusZ : (x,y : Int) LeZ x y -> LeZ (minusZ y) (minusZ x);
+ Intros x y x_le_y;
+ Refine LeZwd;
+ Refine LeZ_plusZl (minusZ x) (plusZ x (minusZ y)) zero;
+ Refine LeZwdr;
+ Refine LeZ_plusZr x y (minusZ y);
+ Refine x_le_y;
+ Refine plusZ_minusZ;
+ Refine plusZ_zero;
+ Refine EqZ_trans;
+ Refine plusZ_minusZ' (minusZ y) x;
+ Refine EqZ_trans;
+ Refine plusZ_comm (minusZ x) (plusZ (minusZ y) x);
+ Refine plusZwdr (minusZ x) (plusZ x (minusZ y)) (plusZ (minusZ y) x);
+ Refine plusZ_comm x (minusZ y);
+ ReturnAll;
+
+> [LeZ_minusZ' : (x,y : Int) LeZ (minusZ x) (minusZ y) -> LeZ y x];
+ Claim LeZ_minusZ' : (x,y : Int) LeZ (minusZ x) (minusZ y) -> LeZ y x;
+ Intros x y H;
+ Refine LeZwd;
+ Refine LeZ_minusZ (minusZ x) (minusZ y);
+ Refine H;
+ Refine minusZ_minusZ;
+ Refine minusZ_minusZ;
+ ReturnAll;
+
+> [LeZ_timesZr : (x, y, z : Int) LeZ x y -> LeZ zero z -> LeZ (timesZ x z) (timesZ y z)];
+ Claim LeZ_timesZr : (x,y,z : Int) LeZ x y -> LeZ zero z -> LeZ (timesZ x z) (timesZ y z);
+ Intros x y z x_le_y zpos;
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine LeE f e;
+ Refine EqE nat ([x : Nat] Le x e);
+ Refine zero_plus;
+ Refine zpos;
+ Intros p pf_is_e;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine EqE2 nat nat Le
+  (plus (plus (plus (times a f) (times b f)) (plus (times c f) (times d f))) (plus (times a p) (times d p)))
+  (plus (plus (times a e) (times b f)) (plus (times c f) (times d e)))
+  (plus (plus (plus (times a f) (times b f)) (plus (times c f) (times d f))) (plus (times c p) (times b p)))
+  (plus (plus (times c e) (times d f)) (plus (times a f) (times b e)));
+ Refine Le_plusl;
+ Refine EqE2 nat nat Le (times (plus a d) p) (plus (times a p) (times d p)) (times (plus c b) p) (plus (times c p) (times b p));
+ Refine Le_timesr;
+ Refine x_le_y;
+ Refine times_plus_distr;
+ Refine times_plus_distr;
+ Refine trans nat ? (plus (plus (times c (plus p f)) (times d f)) (plus (times a f) (times b (plus p f))));
+ Refine wd nat nat ([x : Nat] plus (plus (times c x) (times d f)) (plus (times a f) (times b x)))
+  (plus p f) e;
+ Refine pf_is_e;
+ Refine trans nat ? (plus (plus (plus (times c p) (times c f)) (times d f)) (plus (times a f) (plus (times b p) (times b f))));
+ Refine wd2 nat nat nat ([x,y:Nat] plus (plus x (times d f)) (plus (times a f) y))
+  (plus (times c p) (times c f)) (times c (plus p f)) (plus (times b p) (times b f)) (times b (plus p f));
+ Refine sym;
+ Refine times_plus_distl;
+ Refine sym;
+ Refine times_plus_distl;
+ Refine trans nat ? (plus (plus (plus (plus (times a f) (times b f)) (plus (times c f) (times d f))) (times c p)) (times b p));
+ Refine trans nat ? (plus (plus (plus (plus (times c p) (times c f)) (times d f)) (plus (times a f) (times b f))) (times b p));
+ Refine trans nat ? (plus
+  (plus (plus (times c p) (times c f)) (times d f))
+  (plus (times a f) (plus (times b f) (times b p))));
+ Refine wd nat nat ([x : Nat] (plus (plus (plus (times c p) (times c f)) (times d f)) (plus (times a f) x)))
+  (plus (times b f) (times b p)) (plus (times b p) (times b f));
+ Refine plus_comm;
+ Refine trans nat ? (plus (plus (plus (times c p) (times c f)) (times d f)) (plus (plus (times a f) (times b f)) (times b p)));
+ Refine wd nat nat (plus (plus (plus (times c p) (times c f)) (times d f)));
+ Refine plus_assocr;
+ Refine plus_assocr;
+ Refine wd nat nat [x : Nat] plus x (times b p);
+ Refine trans nat ? (plus (plus (times a f) (times b f)) (plus (plus (times c f) (times d f)) (times c p)));
+ Refine trans nat ? (plus (plus (plus (times c f) (times d f)) (times c p)) (plus (times a f) (times b f)));
+ Refine wd nat nat [x : Nat] plus x (plus (times a f) (times b f));
+ Refine trans nat ? (plus (times c p) (plus (times c f) (times d f)));
+ Refine plus_assocl;
+ Refine plus_comm;
+ Refine plus_comm;
+ Refine plus_assocr;
+ Refine plus_assocl;
+ Refine trans nat ? (plus (plus (times a (plus p f)) (times b f)) (plus (times c f) (times d (plus p f))));
+ Refine wd nat nat ([x : Nat] plus (plus (times a x) (times b f)) (plus (times c f) (times d x)))
+  (plus p f) e;
+ Refine pf_is_e;
+ Refine trans nat ? (plus (plus (plus (times a p) (times a f)) (times b f)) (plus (times c f) (plus (times d p) (times d f))));
+ Refine wd2 nat nat nat ([x,y : Nat] plus (plus x (times b f)) (plus (times c f) y))
+  (plus (times a p) (times a f)) (times a (plus p f))
+  (plus (times d p) (times d f)) (times d (plus p f));
+ Refine times_plus_distl';
+ Refine times_plus_distl';
+ Refine trans nat ? (plus (plus (plus (plus (times a f) (times b f)) (plus (times c f) (times d f))) (times a p)) (times d p));
+ Refine trans nat ? (plus (plus (plus (plus (plus (times a p) (times a f)) (times b f)) (times c f)) (times d f)) (times d p));
+ Refine trans nat ? (plus (plus (plus (plus (times a p) (times a f)) (times b f)) (times c f)) (plus (times d f) (times d p)));
+ Refine trans nat ? (plus (plus (plus (plus (times a p) (times a f)) (times b f)) (times c f)) (plus (times d p) (times d f)));
+ Refine plus_assocr;
+ Refine wd nat nat (plus (plus (plus (plus (times a p) (times a f)) (times b f)) (times c f)));
+ Refine plus_comm;
+ Refine plus_assocr;
+ Refine wd nat nat [x : Nat] plus x (times d p);
+ Refine trans nat ? (plus (times a p) (plus (plus (times a f) (times b f)) (plus (times c f) (times d f))));
+ Refine trans nat ? (plus (plus (plus (times a p) (times a f)) (times b f)) (plus (times c f) (times d f)));
+ Refine plus_assocl;
+ Refine trans nat ? (plus (plus (times a p) (times a f)) (plus (times b f) (plus (times c f) (times d f))));
+ Refine plus_assocl;
+ Refine trans nat ? (plus (times a p) (plus (times a f) (plus (times b f) (plus (times c f) (times d f)))));
+ Refine plus_assocl;
+ Refine wd nat nat (plus (times a p));
+ Refine plus_assocr;
+ Refine plus_comm;
+ Refine plus_assocl;
+ ReturnAll;
+
+> [LeZ_timesZl : (x, y, z : Int) LeZ y z -> LeZ zero x -> LeZ (timesZ x y) (timesZ x z)];
+ Claim LeZ_timesZl : (x,y,z : Int) LeZ y z -> LeZ zero x -> LeZ (timesZ x y) (timesZ x z);
+ Intros x y z y_le_z xpos;
+ Refine LeZwd;
+ Refine LeZ_timesZr y z x;
+ Refine xpos;
+ Refine y_le_z;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+
+ [LeZ_timesZr' : (x, y, z : Int) LeZ x y -> LeZ z zero -> LeZ (timesZ y z) (timesZ x z)];
+> Claim LeZ_timesZr' : (x,y,z : Int) LeZ x y -> LeZ z zero -> LeZ (timesZ y z) (timesZ x z);
+> Intros x y z x_le_y zneg;
+> Refine LeZ_minusZ';
+> Refine LeZwd;
+> 2 Refine timesZ_minusZ;
+> 2 Refine timesZ_minusZ;
+> Refine LeZ_timesZr x y (minusZ z);
+> Refine LeZ_minusZ z zero;
+> Refine zneg;
+> Refine x_le_y;
+> ReturnAll;
+
+> [LeZ_timesZl' : (x, y, z : Int) LeZ x y -> LeZ z zero -> LeZ (timesZ z y) (timesZ z x)];
+ Claim LeZ_timesZl' : (x,y,z : Int) LeZ x y -> LeZ z zero -> LeZ (timesZ z y) (timesZ z x);
+ Intros x y z x_le_y zneg;
+ Refine LeZwd;
+ Refine LeZ_timesZr' x y z;
+ Refine zneg;
+ Refine x_le_y;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+
+> [ltZ [x, y : Int] = lt (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+> [LtZ [x, y : Int] = Lt (plus (pi1 ? ? x) (pi2 ? ? y)) (plus (pi1 ? ? y) (pi2 ? ? x))];
+
+> [LtZwdl : (x,x',y : Int) EqZ x x' -> LtZ x y -> LtZ x' y];
+ Claim LtZwdl : (x, x', y : Int) EqZ x x' -> LtZ x y -> LtZ x' y;
+ Intros x x' y x_is_x' x_lt_y;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [a' = pi1 ? ? x'];
+ [b' = pi2 ? ? x'];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ Refine Lt_plus_cancell b (plus a' d) (plus c b');
+ Refine EqE2 nat nat Lt (plus (plus a d) b') (plus b (plus a' d)) (plus (plus c b) b') (plus b (plus c b'));
+ Refine Lt_plusr;
+ Refine x_lt_y;
+ Refine trans nat ? (plus c (plus b b'));
+ 2 Refine plus_assocr;
+ Refine trans nat ? (plus (plus c b) b');
+ 2 Refine plus_assocl;
+ Refine trans nat ? (plus (plus b c) b');
+ 2 Refine wd nat nat ? ? [z : Nat] plus z b';
+ 2 Refine plus_comm;
+ Refine plus_assocr;
+ Refine trans nat ? (plus a (plus d b'));
+ 2 Refine plus_assocr;
+ Refine trans nat ? (plus a (plus b' d));
+ 2 Refine wd nat nat ? ? (plus a);
+ 2 Refine plus_comm;
+ Refine trans nat ? (plus (plus a b') d);
+ 2 Refine plus_assocl;
+ Refine trans nat ? (plus (plus b a') d);
+ 2 Refine wd nat nat ? ? [z : Nat] plus z d;
+ 2 Refine trans nat ? (plus a' b);
+ 3 Refine x_is_x';
+ 2 Refine plus_comm;
+ Refine plus_assocr;
+ ReturnAll;
+ LtZwdl;
+
+> [LtZwdr : (x,y,y' : Int) EqZ y y' -> LtZ x y -> LtZ x y'];
+ Claim LtZwdr : (x, y, y' : Int) EqZ y y' -> LtZ x y -> LtZ x y';
+ Intros x y y' y_is_y' x_lt_y;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [c' = pi1 ? ? y'];
+ [d' = pi2 ? ? y'];
+ Refine Lt_plus_cancell d (plus a d') (plus c' b);
+ Refine EqE2 nat nat Lt (plus (plus a d) d') (plus d (plus a d')) (plus (plus c b) d') (plus d (plus c' b));
+ Refine Lt_plusr;
+ Refine x_lt_y;
+ Refine trans nat ? (plus c (plus b d'));
+ 2 Refine plus_assocr;
+ Refine trans nat ? (plus c (plus d' b));
+ 2 Refine wd nat nat ? ? (plus c);
+ 2 Refine plus_comm;
+ Refine trans nat ? (plus (plus c d') b);
+ 2 Refine plus_assocl;
+ Refine trans nat ? (plus (plus d c') b);
+ Refine plus_assocr;
+ Refine wd nat nat ? ? [z : Nat] plus z b;
+ Refine trans nat ? (plus c' d);
+ Refine plus_comm;
+ Refine y_is_y';
+ Refine trans nat ? (plus (plus d a) d');
+ Refine plus_assocr;
+ Refine wd nat nat ? ? [z : Nat] plus z d';
+ Refine plus_comm;
+ ReturnAll;
+ LtZwdr;
+
+> [LtZwd : (x,x',y,y':Int) EqZ x x' -> EqZ y y' -> LtZ x y -> LtZ x' y'];
+ Claim LtZwd : (x, x', y, y' : Int) EqZ x x' -> EqZ y y' -> LtZ x y -> LtZ x' y';
+ Intros x x' y y' x_is_x' y_is_y' x_lt_y;
+ Refine LtZwdl x;
+ 2 Refine x_is_x';
+ Refine LtZwdr x y;
+ Refine x_lt_y;
+ Refine y_is_y';
+ ReturnAll;
+ LtZwd;
+
+> [NtoZLt : (m,n : Nat) Lt m n -> LtZ m n];
+ Claim NtoZLt : (m, n : Nat) Lt m n -> LtZ m n;
+ Intros m n m_lt_n;
+ Refine m_lt_n;
+ ReturnAll;
+ NtoZLt;
+
+> [NtoZLt' : (m,n : Nat) LtZ m n -> Lt m n];
+ Claim NtoZLt' : (m, n : Nat) LtZ m n -> Lt m n;
+ Intros m n m_lt_n;
+ Refine m_lt_n;
+ ReturnAll;
+ NtoZLt';
+
+> [LtZ_irref : (x : Int) LtZ x x -> False];
+ Claim LtZ_irref : (x : Int) LtZ x x -> False;
+ Intros x;
+ Refine Lt_irref;
+ ReturnAll;
+ LtZ_irref;
+
+> [LtZ_irref' : (x : Int) (P : Prop) LtZ x x -> P];
+ Claim LtZ_irref' : (x : Int) (P : Prop) LtZ x x -> P;
+ Intros x P x_lt_x;
+ Refine FalseE;
+ Refine LtZ_irref;
+ Refine x_lt_x;
+ ReturnAll;
+ LtZ_irref';
+
+> [LtZ_trans : (x,y,z : Int) LtZ x y -> LtZ y z -> LtZ x z];
+ Claim LtZ_trans : (x, y, z : Int) LtZ x y -> LtZ y z -> LtZ x z;
+ Intros x y z x_lt_y y_lt_z;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine Lt_plus_cancell c (plus a f) (plus e b);
+ Refine Lt_trans ? (plus a (plus e d));
+ 2 Refine EqE nat ([z : Nat] Lt z (plus a (plus e d))) (plus a (plus c f));
+ 3 Refine Lt_plusl;
+ 3 Refine y_lt_z;
+ 2 Refine trans nat ? (plus (plus a c) f);
+ 3 Refine plus_assocl;
+ 2 Refine trans nat ? (plus (plus c a) f);
+ 3 Refine wd nat nat ? ? [t : Nat] plus t f;
+ 3 Refine plus_comm;
+ 2 Refine plus_assocr;
+ Refine EqE2 nat nat Lt (plus (plus a d) e) ? (plus (plus c b) e);
+ 3 Refine trans nat ? (plus a (plus d e));
+ 4 Refine plus_assocr;
+ 3 Refine wd nat nat ? ? (plus a);
+ 3 Refine plus_comm;
+ 2 Refine trans nat ? (plus c (plus b e));
+ 3 Refine plus_assocr;
+ 2 Refine wd nat nat ? ? (plus c);
+ 2 Refine plus_comm;
+ Refine Lt_plusr;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_trans;
+
+> [LtZ_asym : (x,y : Int) LtZ x y -> LtZ y x -> False];
+ Claim LtZ_asym : (x,y : Int) LtZ x y -> LtZ y x -> False;
+ Intros x y x_lt_y y_lt_x;
+ Refine LtZ_irref x;
+ Refine LtZ_trans;
+ Refine y_lt_x;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_asym;
+
+> [LtZ_asym' : (x,y : Int) (P : Prop) LtZ x y -> LtZ y x -> P];
+ Claim LtZ_asym' : (x,y : Int) (P : Prop) LtZ x y -> LtZ y x -> P;
+ Intros x y P x_lt_y y_lt_x;
+ Refine FalseE;
+ Refine LtZ_asym;
+ Refine y_lt_x;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_asym';
+
+> [LtZ_trichotomy : (x,y : Int) Or (Or (LtZ x y) (EqZ x y)) (LtZ y x)];
+ Claim LtZ_trichotomy : (x, y : Int) Or (Or (LtZ x y) (EqZ x y)) (LtZ y x);
+ Intros x y;
+ Refine trichotomy;
+ ReturnAll;
+ LtZ_trichotomy;
+
+> [LtZ_trichotomy' : (x,y : Int) (P : Prop) (LtZ x y -> P) -> (EqZ x y -> P) -> (LtZ y x -> P) -> P];
+ Claim LtZ_trichotomy' : (x, y : Int) (P : Prop) (LtZ x y -> P) -> (EqZ x y -> P) -> (LtZ y x -> P) -> P;
+ Intros x y P H1 H2 H3;
+ Refine OrE;
+ Refine LtZ_trichotomy x y;
+ Refine H3;
+ Refine OrE;
+ Refine H2;
+ Refine H1;
+ ReturnAll;
+ LtZ_trichotomy';
+
+> [LtZ_plusZr : (x,y,z : Int) LtZ x y -> LtZ (plusZ x z) (plusZ y z)];
+ Claim LtZ_plusZr : (x, y, z : Int) LtZ x y -> LtZ (plusZ x z) (plusZ y z);
+ Intros x y z x_lt_y;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine EqE2 nat nat Lt (plus (plus a d) (plus e f)) (plus (plus a e) (plus d f)) (plus (plus c b) (plus e f)) (plus (plus c e) (plus b f));
+ 3 Refine trans nat ? (plus a (plus d (plus e f)));
+ 4 Refine plus_assocr;
+ 3 Refine trans nat ? (plus a (plus e (plus d f)));
+ 4 Refine wd nat nat ? ? (plus a);
+ 4 Refine trans nat ? (plus (plus d e) f);
+ 5 Refine plus_assocl;
+ 4 Refine trans nat ? (plus (plus e d) f);
+ 5 Refine wd nat nat ? ? [t : Nat] plus t f;
+ 5 Refine plus_comm;
+ 4 Refine plus_assocr;
+ 3 Refine plus_assocl;
+ 2 Refine trans nat ? (plus c (plus b (plus e f)));
+ 3 Refine plus_assocr;
+ 2 Refine trans nat ? (plus c (plus e (plus b f)));
+ 3 Refine wd nat nat ? ? (plus c);
+ 3 Refine trans nat ? (plus (plus b e) f);
+ 4 Refine plus_assocl;
+ 3 Refine trans nat ? (plus (plus e b) f);
+ 4 Refine wd nat nat ? ? [t : Nat] plus t f;
+ 4 Refine plus_comm;
+ 3 Refine plus_assocr;
+ 2 Refine plus_assocl;
+ Refine Lt_plusr;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_plusZr;
+
+> [LtZ_plusZl : (x,y,z : Int) LtZ y z -> LtZ (plusZ x y) (plusZ x z)];
+ Claim LtZ_plusZl : (x, y, z : Int) LtZ y z -> LtZ (plusZ x y) (plusZ x z);
+ Intros x y z y_lt_z;
+ Refine LtZwd;
+ 3 Refine plusZ_comm;
+ 2 Refine plusZ_comm;
+ Refine LtZ_plusZr;
+ Refine y_lt_z;
+ ReturnAll;
+ LtZ_plusZl;
+
+> [LtZ_plusZ_cancelr : (x,y,z : Int) LtZ (plusZ x z) (plusZ y z) -> LtZ x y];
+ Claim LtZ_plusZ_cancelr : (x, y, z : Int) LtZ (plusZ x z) (plusZ y z) -> LtZ x y;
+ Intros x y z xz_lt_yz;
+ Refine LtZwd (plusZ (plusZ x z) (minusZ z)) ? (plusZ (plusZ y z) (minusZ z));
+ 3 Refine plusZ_minusZ';
+ 2 Refine plusZ_minusZ';
+ Refine LtZ_plusZr (plusZ x z) (plusZ y z) (minusZ z);
+ Refine xz_lt_yz;
+ ReturnAll;
+ LtZ_plusZ_cancelr;
+
+> [LtZ_plusZ_cancell : (x,y,z : Int) LtZ (plusZ x y) (plusZ x z) -> LtZ y z];
+ Claim LtZ_plusZ_cancell : (x, y, z : Int) LtZ (plusZ x y) (plusZ x z) -> LtZ y z;
+ Intros x y z xy_lt_xz;
+ Refine LtZ_plusZ_cancelr y z x;
+ Refine LtZwd;
+ Refine xy_lt_xz;
+ Refine plusZ_comm;
+ Refine plusZ_comm;
+ ReturnAll;
+ LtZ_plusZ_cancell;
+
+> [LtZ_minusZ : (x,y : Int) LtZ x y -> LtZ (minusZ y) (minusZ x)];
+ Claim LtZ_minusZ : (x, y : Int) LtZ x y -> LtZ (minusZ y) (minusZ x);
+ Intros x y;
+ Expand LtZ;
+ Refine EqE2 nat nat Lt;
+ Refine plus_comm;
+ Refine plus_comm;
+ ReturnAll;
+ LtZ_plusZ_cancelr;
+
+> [LtZ_minusZ_cancel : (x,y : Int) LtZ (minusZ y) (minusZ x) -> LtZ x y];
+ Claim LtZ_minusZ_cancel : (x, y : Int) LtZ (minusZ y) (minusZ x) -> LtZ x y;
+ Intros x y;
+ Expand LtZ;
+ Refine EqE2 nat nat Lt;
+ Refine plus_comm;
+ Refine plus_comm;
+ ReturnAll;
+ LtZ_minusZ_cancel;
+
+> [LtZ_timesZr : (x,y,z : Int) LtZ x y -> LtZ zero z -> LtZ (timesZ x z) (timesZ y z)];
+ Claim LtZ_timesZr : (x, y, z : Int) LtZ x y -> LtZ zero z -> LtZ (timesZ x z) (timesZ y z);
+ Intros x y z x_lt_y zero_lt_z;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ Refine LtE (plus a d) (plus c b);
+ Refine x_lt_y;
+ Intros q dfq;
+ [a = pi1 ? ? x];
+ [b = pi2 ? ? x];
+ [c = pi1 ? ? y];
+ [d = pi2 ? ? y];
+ [e = pi1 ? ? z];
+ [f = pi2 ? ? z];
+ [t = plus (plus (times a f) (times d f)) (plus (times a e) (times d e))];
+ Refine EqE2 nat nat Lt (plus (times (succ q) f) t) (plus (plus (times a e) (times b f)) (plus (times c f) (times d e)))
+   (plus (times (succ q) e) t) (plus (plus (times c e) (times d f)) (plus (times a f) (times b e)));
+ Refine Lt_plusr;
+ Refine Lt_timesl;
+ Refine Peano4;
+ Refine EqE nat [t : Nat] Lt t e;
+ Refine zero_plus;
+ Refine zero_lt_z;
+ Expand t;
+ Refine trans nat ? (plus (times (succ q) e) (plus (plus (times a e) (times d e)) (plus (times a f) (times d f))));
+ 2 Refine wd nat nat ? ? (plus (times (succ q) e));
+ 2 Refine plus_comm;
+ Refine trans nat ? (plus (plus (times (succ q) e) (plus (times a e) (times d e))) (plus (times a f) (times d f)));
+ 2 Refine plus_assocl;
+ 2 Refine trans nat ? (plus (times (succ q) f) (plus (times (plus a d) f) (plus (times a e) (times d e))));
+ 3 Refine wd nat nat ? ? (plus (times (succ q) f));
+ 3 Refine wd nat nat ? ? [z : Nat] plus z (plus (times a e) (times d e));
+ 3 Refine times_plus_distr';
+ 2 Refine trans nat ? (plus (plus (times (succ q) f) (times (plus a d) f)) (plus (times a e) (times d e)));
+ 3 Refine plus_assocl;
+ 2 Refine trans nat ? (plus (plus (times c f) (times b f)) (plus (times a e) (times d e)));
+ 3 Refine wd nat nat ? ? [z : Nat] plus z (plus (times a e) (times d e));
+ 3 Refine trans nat ? (times (plus (succ q) (plus a d)) f);
+ 4 Refine times_plus_distr';
+ 3 Refine trans nat ? (times (plus c b) f);
+ 4 Refine wd nat nat ? ? [z : Nat] times z f;
+ 4 Refine dfq;
+ 3 Refine times_plus_distr;
+ 2 Refine trans nat ? (plus (plus (plus (times c f) (times b f)) (times a e)) (times d e));
+ 3 Refine plus_assocl;
+ 2 Refine trans nat ? (plus (plus (plus (times a e) (times b f)) (times c f)) (times d e));
+ 2 Refine plus_assocr;
+ 2 Refine wd nat nat ? ? [z : Nat] plus z (times d e);
+ 2 Refine trans nat ? (plus (times a e) (plus (times c f) (times b f)));
+ 3 Refine plus_comm;
+ 2 Refine trans nat ? (plus (times a e) (plus (times b f) (times c f)));
+ 3 Refine wd nat nat ? ? (plus (times a e));
+ 3 Refine plus_comm;
+ 2 Refine plus_assocl;
+ Refine trans nat ? (plus (plus (times c e) (times b e)) (plus (times a f) (times d f)));
+ 2 Refine wd nat nat ? ? [z : Nat] plus z (plus (times a f) (times d f));
+ 2 Refine trans nat ? (plus (times (succ q) e) (times (plus a d) e));
+ 3 Refine wd nat nat ? ? (plus (times (succ q) e));
+ 3 Refine times_plus_distr';
+ 2 Refine trans nat ? (times (plus (succ q) (plus a d)) e);
+ 3 Refine times_plus_distr';
+ 2 Refine trans nat ? (times (plus c b) e);
+ 3 Refine wd nat nat ? ? [z : Nat] times z e;
+ 3 Refine dfq;
+ 2 Refine times_plus_distr;
+ Refine trans nat ? (plus (times c e) (plus (times b e) (plus (times a f) (times d f))));
+ 2 Refine plus_assocr;
+ Refine trans nat ? (plus (times c e) (plus (times d f) (plus (times a f) (times b e))));
+ 2 Refine wd nat nat ? ? (plus (times c e));
+ 2 Refine trans nat ? (plus (plus (times a f) (times d f)) (times b e));
+ 3 Refine plus_comm;
+ 2 Refine trans nat ? (plus (times a f) (plus (times d f) (times b e)));
+ 3 Refine plus_assocr;
+ 2 Refine trans nat ? (plus (times a f) (plus (times b e) (times d f)));
+ 3 Refine wd nat nat ? ? (plus (times a f));
+ 3 Refine plus_comm;
+ 2 Refine trans nat ? (plus (plus (times a f) (times b e)) (times d f));
+ 3 Refine plus_assocl;
+ 2 Refine plus_comm;
+ Refine plus_assocl;
+ ReturnAll;
+ LtZ_timesZr;
+
+> [LtZ_timesZl : (x,y,z : Int) LtZ y z -> LtZ zero x -> LtZ (timesZ x y) (timesZ x z)];
+ Claim LtZ_timesZl : (x, y, z : Int) LtZ y z -> LtZ zero x -> LtZ (timesZ x y) (timesZ x z);
+ Intros x y z y_lt_z zero_lt_x;
+ Refine LtZwd;
+ Refine LtZ_timesZr y z x;
+ Refine zero_lt_x;
+ Refine y_lt_z;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+ LtZ_timesZl;
+
+> [LtZ_timesZr' : (x,y,z : Int) LtZ x y -> LtZ z zero -> LtZ (timesZ y z) (timesZ x z)];
+ Claim LtZ_timesZr' : (x, y, z : Int) LtZ x y -> LtZ z zero -> LtZ (timesZ y z) (timesZ x z);
+ Intros x y z x_lt_y z_lt_zero;
+ Refine LtZ_minusZ_cancel;
+ Refine LtZ_timesZr x y (minusZ z);
+ Refine LtZ_minusZ z zero;
+ Refine z_lt_zero;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_timesZr';
+
+> [LtZ_timesZl' : (x,y,z : Int) LtZ y z -> LtZ x zero -> LtZ (timesZ x z) (timesZ x y)];
+ Claim LtZ_timesZl' : (x, y, z : Int) LtZ y z -> LtZ x zero -> LtZ (timesZ x z) (timesZ x y);
+ Intros x y z y_lt_z x_lt_zero;
+ Refine LtZwd;
+ Refine LtZ_timesZr' y z x;
+ Refine x_lt_zero;
+ Refine y_lt_z;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+ LtZ_timesZl';
+
+> [LtZ_timesZ_cancelr : (x,y,z : Int) LtZ (timesZ x z) (timesZ y z) -> LtZ zero z -> LtZ x y];
+ Claim LtZ_timesZ_cancelr : (x, y, z : Int) LtZ (timesZ x z) (timesZ y z) -> LtZ zero z -> LtZ x y;
+ Intros x y z xz_lt_yz zero_lt_z;
+ Refine LtZ_trichotomy' x y;
+Case y < x:
+ Intros y_lt_x;
+ Refine LtZ_asym' (timesZ x z) (timesZ y z);
+ Refine LtZ_timesZr;
+ Refine zero_lt_z;
+ Refine y_lt_x;
+ Refine xz_lt_yz;
+ ReturnAll;
+Case  x = y:
+ Intros x_is_y;
+ Refine LtZ_irref' (timesZ x z);
+ Refine LtZwd;
+ Refine xz_lt_yz;
+ Refine timesZwd;
+ Refine EqZ_ref;
+ Refine EqZ_sym;
+ Refine x_is_y;
+ Refine EqZ_ref;
+ ReturnAll;
+Case x < y:
+ Intros x_lt_y;
+ Refine x_lt_y;
+ ReturnAll;
+ LtZ_timesZ_cancelr;
+
+> [LtZ_timesZ_cancell : (x,y,z : Int) LtZ (timesZ x y) (timesZ x z) -> LtZ zero x -> LtZ y z];
+ Claim LtZ_timesZ_cancell : (x, y, z : Int) LtZ (timesZ x y) (timesZ x z) -> LtZ zero x -> LtZ y z;
+ Intros x y z xy_lt_xz zero_lt_x;
+ Refine LtZ_timesZ_cancelr;
+ Refine zero_lt_x;
+ Refine LtZwd;
+ Refine xy_lt_xz;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+ LtZ_timesZ_cancell;
+
+> [LtZ_timesZ_cancelr' : (x,y,z : Int) LtZ (timesZ x z) (timesZ y z) -> LtZ z zero -> LtZ y x];
+ Claim LtZ_timesZ_cancelr' : (x, y, z : Int) LtZ (timesZ x z) (timesZ y z) -> LtZ z zero -> LtZ y x;
+ Intros x y z xz_lt_yz z_lt_zero;
+ Refine LtZ_timesZ_cancelr y x (minusZ z);
+ Refine LtZ_minusZ z zero;
+ Refine z_lt_zero;
+ Refine LtZ_minusZ (timesZ x z) (timesZ y z);
+ Refine xz_lt_yz;
+ ReturnAll;
+ LtZ_timesZ_cancelr';
+
+> [LtZ_timesZ_cancell' : (x,y,z : Int) LtZ (timesZ x y) (timesZ x z) -> LtZ x zero -> LtZ z y];
+ Claim LtZ_timesZ_cancell' : (x, y, z : Int) LtZ (timesZ x y) (timesZ x z) -> LtZ x zero -> LtZ z y;
+ Intros x y z xy_lt_xz x_lt_zero;
+ Refine LtZ_timesZ_cancelr' y z x;
+ Refine x_lt_zero;
+ Refine LtZwd;
+ Refine xy_lt_xz;
+ Refine timesZ_comm;
+ Refine timesZ_comm;
+ ReturnAll;
+ LtZ_timesZ_cancell';
+
+> [timesZ_cancelr : (x,y,z : Int) EqZ (timesZ x z) (timesZ y z) -> Not (EqZ z zero) -> EqZ x y];
+ Claim timesZ_cancelr : (x,y,z : Int) EqZ (timesZ x z) (timesZ y z) -> Not (EqZ z zero) -> EqZ x y;
+ Intros x y z xz_is_yz z_not_zero;
+ Refine LtZ_trichotomy' z zero;
+Case 0 < z:
+ Intros zero_lt_z;
+ Refine LtZ_trichotomy' x y;
+Case 0 < z and y < x:
+ Intros y_lt_x;
+ Refine LtZ_irref' (timesZ y z);
+ Refine LtZwd;
+ 3 Refine EqZ_ref (timesZ y z);
+ 2 Refine xz_is_yz;
+ Refine LtZ_timesZr;
+ Refine zero_lt_z;
+ Refine y_lt_x;
+ ReturnAll;
+Case 0 < z and x = y:
+ Intros x_is_y;
+ Refine x_is_y;
+ ReturnAll;
+Case 0 < z and x < y:
+ Intros x_lt_y;
+ Refine LtZ_irref' (timesZ y z);
+ Refine LtZwd;
+ 2 Refine EqZ_ref (timesZ y z);
+ 2 Refine xz_is_yz;
+ Refine LtZ_timesZr;
+ Refine zero_lt_z;
+ Refine x_lt_y;
+ ReturnAll;
+Case z = 0:
+ Refine NotE';
+ Refine z_not_zero;
+Case z < 0:
+ Intros z_lt_zero;
+ Refine LtZ_trichotomy' x y;
+Case z < 0 and y < x:
+ Intros y_lt_x;
+ Refine LtZ_irref' (timesZ y z);
+ Refine LtZwd;
+ 3 Refine xz_is_yz;
+ 2 Refine EqZ_ref (timesZ y z);
+ Refine LtZ_timesZr';
+ Refine z_lt_zero;
+ Refine y_lt_x;
+ ReturnAll;
+Case z < 0 and x = y
+ Intros x_is_y;
+ Refine x_is_y;
+ ReturnAll;
+Case z < 0 and x < y:
+ Intros x_lt_y;
+ Refine LtZ_irref' (timesZ y z);
+ Refine LtZwd;
+ 3 Refine EqZ_ref (timesZ y z);
+ 2 Refine xz_is_yz;
+ Refine LtZ_timesZr';
+ Refine z_lt_zero;
+ Refine x_lt_y;
+ ReturnAll;
+ timesZ_cancelr;
+
+> [timesZ_cancell : (x,y,z : Int) EqZ (timesZ x y) (timesZ x z) -> Not (EqZ x zero) -> EqZ y z];
+ Claim timesZ_cancell : (x, y, z : Int) EqZ (timesZ x y) (timesZ x z) -> Not (EqZ x zero) -> EqZ y z;
+ Intros x y z xy_is_xz x_not_zero;
+ Refine timesZ_cancelr y z x;
+ Refine x_not_zero;
+ Refine EqZ_trans (timesZ y x) (timesZ x y) (timesZ z x);
+ 2 Refine timesZ_comm;
+ Refine EqZ_trans (timesZ x y) (timesZ x z) (timesZ z x);
+ Refine timesZ_comm;
+ Refine xy_is_xz;
+ ReturnAll;
+ timesZ_cancell;
+
+> [LeZ_timesZ_cancelr : (x, y, z : Int) LeZ (timesZ x z) (timesZ y z) -> LtZ zero z -> LeZ x y];
+> [LeZ_timesZ_cancell : (x, y, z : Int) LeZ (timesZ x y) (timesZ x z) -> LtZ zero x -> LeZ y z];
+> [LeZ_timesZ_cancelr' : (x, y, z : Int) LeZ (timesZ x z) (timesZ y z) -> LtZ z zero -> LeZ y x];
+> [LeZ_timesZ_cancell' : (x, y, z : Int) LeZ (timesZ x y) (timesZ x z) -> LtZ x zero -> LeZ z y];
+
+> Claim timesZ_zeror : (x, y : Int) EqZ (timesZ x y) zero -> Not (EqZ x zero) -> EqZ y zero;
+> Intros x y xy_is_zero x_not_zero;
+> Refine LtZ_trichotomy' y zero;
+Case 0 < y:
+> Intros zero_lt_y;
+> Refine LtZ_trichotomy' x zero;
+Case 0 < y and 0 < x:
+> Intros zero_lt_x;
+> Refine LtZ_irref' zero;
+> Refine LtZwd;
+> 3 Refine timesZ_zero x;
+> 2 Refine xy_is_zero;
+> Refine LtZ_timesZl x zero y;
+> Refine zero_lt_x;
+> Refine zero_lt_y;
+> ReturnAll;
+Case 0 < y and x = 0:
+> Refine NotE';
+> Refine x_not_zero;
+Case 0 < y and x < 0:
+> Intros x_lt_zero;
+> Refine LtZ_irref' zero;
+> Refine LtZwd;
+> 3 Refine xy_is_zero;
+> 2 Refine timesZ_zero x;
+> Refine LtZ_timesZl' x zero;
+> Refine x_lt_zero;
+> Refine zero_lt_y;
+> ReturnAll;
+Case y = 0:
+> Intros y_is_zero;
+> Refine y_is_zero;
+> ReturnAll;
+Case y < 0:
+> Intros y_lt_zero;
+> Refine LtZ_trichotomy' x zero;
+Case y < 0 and 0 < x:
+> Intros zero_lt_x;
+> Refine LtZ_irref' zero;
+> Refine LtZwd;
+> 3 Refine xy_is_zero;
+> 2 Refine timesZ_zero x;
+> Refine LtZ_timesZl x y zero;
+> Refine zero_lt_x;
+> Refine y_lt_zero;
+> ReturnAll;
+Case y < 0 and x = 0:
+> Refine NotE';
+> Refine x_not_zero;
+Case y < 0 and x < 0:
+> Intros x_lt_zero;
+> Refine LtZ_irref' zero;
+> Refine LtZwd;
+> 2 Refine xy_is_zero;
+> 2 Refine timesZ_zero x;
+> Refine LtZ_timesZl' x y zero;
+> Refine x_lt_zero;
+> Refine y_lt_zero;
+> ReturnAll;
+> timesZ_zeror;
+
+> Claim timesZ_zerol : (x, y : Int) EqZ (timesZ x y) zero -> Not (EqZ y zero) -> EqZ x zero;
+> Intros x y xy_is_zero y_not_zero;
+> Refine timesZ_zeror;
+> Refine y_not_zero;
+> Refine EqZ_trans;
+> Refine xy_is_zero;
+> Refine timesZ_comm;
+> ReturnAll;
+> timesZ_zerol;
+
+> Claim timesZ_not_zero : (x, y : Int) Not (EqZ x zero) -> Not (EqZ y zero) -> Not (EqZ (timesZ x y) zero);
+> Intros x y x_not_zero y_not_zero;
+> Refine NotI;
+> Intros xy_is_zero;
+> Refine NotE;
+> 2 Refine y_not_zero;
+> Refine timesZ_zeror;
+> Refine x_not_zero;
+> Refine xy_is_zero;
+> ReturnAll;
+> timesZ_not_zero;
+
+> Claim zero_LtZ_one : LtZ zero one;
+> Refine NtoZLt zero one;
+> Refine LtI;
+> 2 Refine zero;
+> Refine EqI;
+> ReturnAll;
+> zero_LtZ_one;
+
+Positivity
+
+> [posZ [x : Int] = ltZ zero x];
+> [PosZ [x : Int] = LtZ zero x];
+
+> [PosZwd : (x, x' : Int) EqZ x x' -> PosZ x -> PosZ x'];
+
+> [negZ [x : Int] = ltZ x zero];
+> [NegZ [x : Int] = LtZ x zero];
+
+> [NegZwd : (x, x' : Int) EqZ x x' -> NegZ x -> NegZ x'];
+
+> Claim PosZ_or_NegZ : (x : Int) (P : Prop) Not (EqZ x zero) -> (PosZ x -> P) -> (NegZ x -> P) -> P;
+> Intros x P x_not_zero posx negx;
+> Refine LtZ_trichotomy' x zero;
+> Refine posx;
+> Refine NotE';
+> Refine x_not_zero;
+> Refine negx;
+> ReturnAll;
+> PosZ_or_NegZ;
+
+> Claim Not_PosZ_NegZ : (x : Int) (P : Prop) PosZ x -> NegZ x -> P;
+> Refine LtZ_asym';
+> ReturnAll;
+> Not_PosZ_NegZ;
+
+> Claim PosZ_not_zero : (x : Int) PosZ x -> Not (EqZ x zero);
+> Intros x posx;
+> Refine NotI;
+> Intros x_is_zero;
+> Refine LtZ_irref;
+> Refine LtZwdl;
+> Refine posx;
+> Refine sym;
+> Refine x_is_zero;
+> ReturnAll;
+> PosZ_not_zero;
+
+> Claim NegZ_not_zero : (x : Int) NegZ x -> Not (EqZ x zero);
+> Intros x negx;
+> Refine NotI;
+> Intros x_is_zero;
+> Refine LtZ_irref;
+> Refine LtZwdr;
+> 3 Refine zero;
+> Refine negx;
+> Refine sym;
+> Refine x_is_zero;
+> ReturnAll;
+> NegZ_not_zero;

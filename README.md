@@ -10,7 +10,7 @@ Unfortunately, the proof assistant Plastic seems to be no longer readily availab
 
 http://homepages.inf.ed.ac.uk/wadler/realworld/plastic.html
 
-The formalisation is described in my paper "Weyl's Predicative Classical Mathematics as a Logic-Enriched Type Theory":
+The formalisation is described in my paper "Weyl's Predicative Classical Mathematics as a Logic-Enriched Type Theory", available here:
 
 http://dx.doi.org/10.1145/1656242.1656246
 
